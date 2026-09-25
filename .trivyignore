@@ -1,0 +1,11 @@
+# Trivy does not read comments for logic; these lines are recorded risk
+# acceptance for CVEs with no released fix.
+
+# extract-zip@2.0.1 is pulled in only through the dev-only chain
+# lighthouse -> puppeteer-core -> @puppeteer/browsers -> extract-zip.
+# It unpacks browser archives that @puppeteer/browsers itself downloads
+# over HTTPS, in CI and local shells only; nothing in the built site
+# depends on it. No fixed version has been published. Remove these
+# entries once a patched extract-zip ships and reaches the lockfile.
+CVE-2026-19693
+CVE-2026-56876

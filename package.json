@@ -91,7 +91,7 @@
 		"playwright": "^1.59.1",
 		"postcss-scss": "^4.0.9",
 		"sass": "^1.99.0",
-		"sharp": "^0.34.5",
+		"sharp": "^0.35.4",
 		"tinyglobby": "^0.2.14",
 		"uwrap": "^0.1.2",
 		"yaml": "^2.8.3"
