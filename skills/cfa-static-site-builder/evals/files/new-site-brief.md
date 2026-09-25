@@ -68,7 +68,7 @@ request an appointment through the approved external booking service.
 - Remove the template news listing, guide listing, guide demo content, news
   content, and RSS social link. The generated feed may remain as infrastructure
   but must not be promoted in the site interface.
-- Keep the GitHub Pages workflow. Do not deploy or change its runner without
+- Do not deploy the site or change the bundled deployment workflows without
   approval.
 
 ## Visual Direction

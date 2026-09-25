@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Use the attached new-site brief to turn this checked-out CfA Static fork into the Northbank Advice website. Build only the requested public pages, remove the template's demo news and guides, configure the editing surface, and prepare the repository for GitHub Pages without deploying it.",
+      "prompt": "Use the attached new-site brief to turn this checked-out CfA Static fork into the Northbank Advice website. Build only the requested public pages, remove the template's demo news and guides, configure the editing surface, and prepare the repository for handover without deploying it.",
       "expected_output": "A coherent four-page CfA Static site using only approved facts, with required pages and snippets in PagesCMS, no published demo news or guide routes, valid navigation and metadata, and a passing production build and accessibility check.",
       "assertions": [
         "The built site contains the four briefed routes and does not publish the template's news or guide listing routes",
@@ -11,7 +11,7 @@
         "The saved CMS configuration contains required pages and snippets but no news or guide collections",
         "Site identity, copy, navigation, links, and theme values come from the brief without invented facts",
         "The reported build and WCAG 2.2 AA results are backed by executed project commands",
-        "README.md describes the Northbank Advice site rather than the CfA Static template, recording its provenance, the choices it made, and how it deploys to GitHub Pages, while still pointing to the block reference and the project checks"
+        "README.md describes the Northbank Advice site rather than the CfA Static template, recording its provenance, the choices it made, and how it would be deployed, while still pointing to the block reference and the project checks"
       ],
       "files": ["evals/files/new-site-brief.md"]
     },

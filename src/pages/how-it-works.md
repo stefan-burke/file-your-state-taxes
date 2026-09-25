@@ -50,16 +50,20 @@ blocks:
   - type: split-code
     subtitle: "Step 4 - Deploy"
     content: |
-      ## Push to deploy
+      ## Dispatch to deploy
 
-      A GitHub Actions workflow builds and publishes the site to GitHub
-      Pages on every push to `main` - project subpaths and custom domains
-      both work without editing anything. `_site/` is also uploaded as a
-      build artifact, so any other static host can serve it instead.
+      Under **Actions**, run **Deploy to SharedServices** on `main` and pick
+      an environment. The workflow stamps the site with that environment's
+      URL and hands `_site/` to Code for America's shared static deployment
+      workflow, which assumes the app's AWS role, syncs the bucket, and
+      invalidates the CDN cache - with Okta single sign-on enforced at the
+      edge. A bundled workflow also publishes a public copy to GitHub Pages
+      on every push to `main`, and `_site/` is uploaded as a build
+      artifact, so any other static host can serve it instead.
     reverse: true
-    figure_filename: .github/workflows/pages.yml
+    figure_filename: .github/workflows/sharedservices-deploy.yaml
     figure_language: yaml
-    figure_code: "- name: Build Site\n  env:\n    PATH_PREFIX: ${{ steps.pages.outputs.base_path }}/\n    SITE_URL: ${{ steps.pages.outputs.base_url }}\n  run: npm run build"
+    figure_code: "deploy:\n  needs: build\n  uses: codeforamerica/shared-services-infra/.github/workflows/shared-deploy-static.yaml@main\n  with:\n    artifact_ids: ${{ needs.build.outputs.artifact-id }}\n    environment: ${{ inputs.environment }}"
   - type: cta
     content: |
       ## Explore the blocks

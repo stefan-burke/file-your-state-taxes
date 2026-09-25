@@ -288,7 +288,7 @@ describe("scss", () => {
     const result = await compileDesignSystemBundle();
     const menuRule =
       result.match(
-        /\.design-system\.sticky-mobile-nav nav > ul\s*\{[^}]*\}/,
+        /\.design-system\.sticky-mobile-nav nav\.site-nav > ul\s*\{[^}]*\}/,
       )?.[0] ?? "";
 
     expect(menuRule).toContain("overflow-y: auto");
@@ -297,6 +297,48 @@ describe("scss", () => {
     expect(menuRule).toContain("height: calc(100vh - 3rem)");
     expect(menuRule).toContain("height: calc(100dvh - 3rem)");
     expect(menuRule).toContain("-webkit-overflow-scrolling: touch");
+  });
+
+  test("Mobile sticky nav positioning targets only the site header nav", async () => {
+    const result = await compileDesignSystemBundle();
+
+    const stickyBarRule =
+      result.match(
+        /\.design-system\.sticky-mobile-nav nav\.site-nav\s*\{[^}]*\}/,
+      )?.[0] ?? "";
+    expect(stickyBarRule).toContain("position: fixed");
+
+    const unscopedBar = result.match(
+      /\.design-system\.sticky-mobile-nav nav\s*\{/,
+    );
+    expect(unscopedBar).toBeNull();
+  });
+
+  test("Desktop horizontal nav positioning targets only the site header nav", async () => {
+    const result = await compileDesignSystemBundle();
+
+    const horizontalRules =
+      result.match(
+        /\.design-system\.horizontal-nav nav\.site-nav\s*\{[^}]*\}/g,
+      ) ?? [];
+    expect(
+      horizontalRules.some((rule) => rule.includes("position: sticky")),
+    ).toBe(true);
+
+    const unscopedHorizontal = result.match(
+      /\.design-system\.horizontal-nav nav\s*\{/,
+    );
+    expect(unscopedHorizontal).toBeNull();
+  });
+
+  test("Design-system bundle ships table-of-contents card styling", async () => {
+    const result = await compileDesignSystemBundle();
+    const tocRule =
+      result.match(/\.design-system \.table-of-contents\s*\{[^}]*\}/)?.[0] ??
+      "";
+
+    expect(tocRule).toContain("border-radius");
+    expect(tocRule).toContain("background");
   });
 
   test("Design-system bundle defines default link decoration tokens", async () => {

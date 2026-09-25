@@ -14,7 +14,9 @@
   // BASE NAV
   // ===========================================================================
 
-  nav {
+  // Only the site's own header nav is positioned by these rules; other
+  // <nav> elements (guide breadcrumbs, table-of-contents) style themselves.
+  nav.site-nav {
     @include nav.nav-base;
 
     .nav-thumbnails {
@@ -34,7 +36,7 @@
     &.sticky-mobile-nav {
       padding-top: 5rem;
 
-      nav {
+      nav.site-nav {
         @include nav.nav-sticky-bar($z-sticky, $space-xs);
 
         .toggle {
@@ -63,11 +65,11 @@
       display: none !important;
     }
 
-    &.left-nav nav {
+    &.left-nav nav.site-nav {
       @include nav.nav-left($space-sm);
     }
 
-    &.horizontal-nav nav {
+    &.horizontal-nav nav.site-nav {
       @include nav.nav-horizontal-layout($space-lg, $space-xs);
 
       position: sticky;
@@ -89,12 +91,12 @@
   // ===========================================================================
 
   // Click-mode (when device lacks hover)
-  &:not(.nav-can-hover) nav {
+  &:not(.nav-can-hover) nav.site-nav {
     @include nav.nav-submenu-toggle;
   }
 
   // Hover-mode (when device supports hover)
-  &.nav-can-hover.horizontal-nav nav {
+  &.nav-can-hover.horizontal-nav nav.site-nav {
     @include nav.nav-hover-dropdowns;
   }
 }

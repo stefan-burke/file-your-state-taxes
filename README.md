@@ -107,35 +107,17 @@ to merge them, reviews what changed, and re-runs the site's own checks. The
 quality gates travel with the fork, so a site that pulls an update finds out
 immediately whether the update broke anything it publishes.
 
-## Deploying to GitHub Pages
+## Deployment
 
-The repo ships a workflow (`.github/workflows/pages.yml`) that builds and
-deploys to GitHub Pages on every push to `main`. One-time setup: under the
-repository's **Settings → Pages**, set **Source** to **GitHub Actions**.
-On a fork that keeps the Pages workflow, confirm Pages is enabled the same
-way; the jobs run on standard `ubuntu-latest` runners, so no extra
-integration or billing is required.
-
-The workflow handles both hosting shapes automatically: on a project site
-(`https://<owner>.github.io/<repo>/`) it builds with the `/<repo>/` path
-prefix and rewrites internal URLs to match; with a custom domain or a
-user/organization site it builds with no prefix. Canonical URLs, the sitemap,
-and feeds pick up the public site base URL via `SITE_URL`. Keep `site.json`'s
-`url` set to the site's public base URL as the fallback for local and
-non-workflow builds.
-
-## Deploying to SharedServices (internal)
-
-The repo can also publish the same site unchanged to SharedServices, CfA's
-Okta-protected internal hosting. The `sharedservices-deploy.yaml` workflow
-builds `_site/` from the same commit as the Pages deployment — differing only
-in `SITE_URL` — then passes its artifact to the platform's
+The default deployment is SharedServices, CfA's Okta-protected internal
+hosting. The `sharedservices-deploy.yaml` workflow builds `_site/` with the
+selected environment's `SITE_URL`, then passes its artifact to the platform's
 [shared static deployment workflow](https://github.com/codeforamerica/shared-services-infra/blob/main/.github/workflows/shared-deploy-static.yaml).
 The shared workflow handles AWS authentication, S3 sync, and CloudFront
-invalidation. Okta SSO is
-enforced at the edge, so the site itself never handles authentication.
-Deployment is manual while piloted: run **Actions → Deploy to
-SharedServices** on `main`.
+invalidation. Okta SSO is enforced at the edge, so the site itself never
+handles authentication. Deployment is manual: under **Actions**, run
+**Deploy to SharedServices** on `main` and pick an environment; a dispatch
+queues behind an in-flight deploy rather than cancelling it mid-sync.
 
 One-time setup is a DevOps task:
 
@@ -146,16 +128,30 @@ One-time setup is a DevOps task:
    `CLOUDFRONT_DISTRIBUTION_ID` (for cache invalidation), and `SITE_URL` (the app's
    endpoint URL, with no trailing slash), plus the `AWS_ROLE_ARN` secret.
 
-The public GitHub Pages deployment is unaffected. `app.yaml` at the repo root
-declares the platform registration. SharedServices serves each app at the
-root of its own subdomain (`https://<name>.apps.<domain>`), so the internal
-build involves no path prefix — only `SITE_URL` differs from the public one.
-For a step-by-step walkthrough of the one-time
+`app.yaml` at the repo root declares the platform registration. SharedServices
+serves each app at the root of its own subdomain
+(`https://<name>.apps.<domain>`), so builds involve no path prefix. For a
+step-by-step walkthrough of the one-time
 setup — written for a DevOps engineer and whoever coordinates them — see
 [`docs/devops-sharedservices-setup.html`](docs/devops-sharedservices-setup.html).
 Both deploy workflows merge `docs/` into the built site, so the walkthrough is
 also served at `/docs/devops-sharedservices-setup.html` under each deployment's
 base URL, not at a `/docs/` index page.
+
+### Public deployment to GitHub Pages
+
+The repo also ships a public deploy workflow (`.github/workflows/pages.yml`)
+that builds and publishes to GitHub Pages on every push to `main`. One-time
+setup: under the repository's **Settings → Pages**, set **Source** to
+**GitHub Actions**. On a project site (`https://<owner>.github.io/<repo>/`)
+the build uses the `/<repo>/` path prefix and rewrites internal URLs to
+match; with a custom domain or a user/organization site it builds with no
+prefix. Both deployments build `_site/` from the same commit and differ only
+in `SITE_URL`.
+
+To host elsewhere instead, `npm run build` produces a self-contained `_site/`
+directory with no application server and no application-secret requirement;
+point any static host - or your own pipeline - at it.
 
 ## Configuration
 

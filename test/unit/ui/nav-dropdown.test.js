@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from "vitest";
 import { initNavDropdown } from "#public/ui/nav-dropdown.js";
 
 const NAV_HTML = `
-<nav>
+<nav class="site-nav">
   <ul>
     <li>
       <a href="/products/">Products</a>

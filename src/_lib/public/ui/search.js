@@ -39,8 +39,8 @@ const renderResult = (result) => {
 
 /**
  * The site's path prefix, read from the bundle script tag so search works
- * when the site is served from a subdirectory (e.g. a GitHub Pages project
- * site). Defaults to "/" when the attribute is absent.
+ * when the site is served from a subdirectory. Defaults to "/" when the
+ * attribute is absent.
  */
 const pathPrefix = () =>
   document.querySelector("script[data-path-prefix]")?.dataset.pathPrefix || "/";

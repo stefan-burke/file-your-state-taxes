@@ -53,7 +53,9 @@ export const initNavDropdown = () => {
   const navToggle = document.getElementById("nav-toggle");
   if (navToggle) navToggle.checked = false;
 
-  const navItems = document.querySelectorAll("nav > ul > li:has(> ul)");
+  const navItems = document.querySelectorAll(
+    "nav.site-nav > ul > li:has(> ul)",
+  );
   if (navItems.length === 0) return;
 
   const hoverQuery = window.matchMedia("(hover: hover)");

@@ -16,8 +16,8 @@ blocks:
       Identity: the site's name, canonical `url`, and social links. The
       `url` feeds canonical tags, the sitemap, and the feed. Deployments
       can override it with the `SITE_URL` environment variable, which is
-      how the GitHub Pages workflow serves the same site from any public
-      base URL without edits.
+      how the deploy workflows serve the same site from different base
+      URLs without edits.
 
       ## config.json
 

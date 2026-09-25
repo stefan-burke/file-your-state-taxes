@@ -97,7 +97,7 @@ enabled, inspect them rather than treating capture success as visual approval.
 
 ## Project-Path Check
 
-When deployment is a GitHub Pages project site or another subpath, rely on the
+When the site is served from a subpath, rely on the
 existing integration test. For an extra production smoke test, use a valid
 public site base URL with no trailing slash:
 
