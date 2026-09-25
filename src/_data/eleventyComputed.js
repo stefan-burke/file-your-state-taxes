@@ -14,11 +14,18 @@ import {
 import { collectItemErrors } from "#utils/validate-item.js";
 
 /**
- * @param {import("#lib/types").EleventyComputedData} data - Page data
- * @param {string} tag - Tag to check for
- * @returns {boolean} Whether data has the given tag
+ * Throw a single error joining the messages when a list is non-empty.
+ * @param {unknown[]} messages
  */
-const hasTag = (data, tag) => (data.tags || []).includes(tag);
+const throwIfNotEmpty = (messages) => {
+  if (messages.length > 0) throw new Error(messages.join("\n"));
+};
+
+/**
+ * The reveal-figure default shared by every split-* block.
+ * @type {Record<string, unknown>}
+ */
+const SPLIT_DEFAULTS = { reveal_figure: "scale" };
 
 /**
  * Default values for block types. Applied at build time so templates
@@ -28,30 +35,16 @@ const hasTag = (data, tag) => (data.tags || []).includes(tag);
 const BLOCK_DEFAULTS = {
   features: { reveal: true, center: false },
   stats: { reveal: true },
-  "split-image": { reveal_figure: "scale" },
-  "split-code": { reveal_figure: "scale" },
-  "split-icon-links": { reveal_figure: "scale" },
-  "split-html": { reveal_figure: "scale" },
-  "split-callout": { reveal_figure: "scale" },
+  "split-image": SPLIT_DEFAULTS,
+  "split-code": SPLIT_DEFAULTS,
+  "split-icon-links": SPLIT_DEFAULTS,
+  "split-html": SPLIT_DEFAULTS,
+  "split-callout": SPLIT_DEFAULTS,
   "section-header": { align: "center" },
   "image-cards": { reveal: true },
   "code-block": { reveal: true },
   "icon-links": { reveal: true },
   downloads: { reveal: true },
-};
-
-/** @param {Record<string, unknown>} block */
-const applyBlockDefaults = (block) => {
-  const blockType = String(block.type);
-  const merged = Object.assign(
-    { dark: false },
-    BLOCK_DEFAULTS[blockType],
-    block,
-  );
-  if (blockType.startsWith("split-") && !block.reveal_content) {
-    merged.reveal_content = block.reverse ? "right" : "left";
-  }
-  return merged;
 };
 
 export default {
@@ -161,7 +154,7 @@ export default {
    */
   meta: (data) => {
     if (data.no_index) return undefined;
-    if (hasTag(data, "news")) return buildPostMeta(data);
+    if ((data.tags || []).includes("news")) return buildPostMeta(data);
     if (data.schema_type === "organization") return buildOrganizationMeta(data);
     return buildBaseMeta(data);
   },
@@ -169,6 +162,8 @@ export default {
   /**
    * Validates and applies default values to blocks. Works for any content
    * with blocks.
+   * A page flagged `block_gallery` builds its blocks from the canonical
+   * per-type examples instead of frontmatter - see #utils/block-gallery.js.
    * @param {import("#lib/types").EleventyComputedData} data - Page data
    * @returns {Promise<Array<Record<string, unknown>>|undefined>} Blocks with defaults applied
    * @throws {Error} If any block contains unknown keys
@@ -176,20 +171,31 @@ export default {
   blocks: async (data) => {
     const context = ` in ${data.page.inputPath}`;
     const itemErrors = collectItemErrors(data, context);
-    // A page flagged `block_gallery` builds its blocks from the canonical
-    // per-type examples instead of frontmatter - see #utils/block-gallery.js.
     const sourceBlocks = data.block_gallery
       ? buildGalleryBlocks()
       : data.blocks;
     if (!sourceBlocks) {
-      if (itemErrors.length > 0) throw new Error(itemErrors.join("\n"));
+      throwIfNotEmpty(itemErrors);
       return sourceBlocks;
     }
     const allErrors = [
       ...itemErrors,
       ...collectBlockErrors(sourceBlocks, context),
     ];
-    if (allErrors.length > 0) throw new Error(allErrors.join("\n"));
-    return sourceBlocks.map(applyBlockDefaults);
+    throwIfNotEmpty(allErrors);
+    return sourceBlocks.map(
+      /** @param {Record<string, unknown>} block */ (block) => {
+        const blockType = String(block.type);
+        const merged = Object.assign(
+          { dark: false },
+          BLOCK_DEFAULTS[blockType],
+          block,
+        );
+        if (blockType.startsWith("split-") && !block.reveal_content) {
+          merged.reveal_content = block.reverse ? "right" : "left";
+        }
+        return merged;
+      },
+    );
   },
 };

@@ -6,7 +6,7 @@ For creating and maintaining a site with CfA Static. Regenerate with `npm run ge
 
 ## Runtime And Commands
 
-Use Node `>=22` and npm. Install dependencies from the repository root:
+Use Node `>=22.15` and npm. Install dependencies from the repository root:
 
 ```sh
 npm install

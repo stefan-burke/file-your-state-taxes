@@ -14,6 +14,7 @@
  * {% assign author = collections.team | getBySlug: authorSlug %}
  */
 
+import { registerFilters } from "#eleventy/register.js";
 import { unique } from "#utils/fp/array.js";
 import { indexBy } from "#utils/fp/memoize.js";
 import { normaliseSlug } from "#utils/slug-utils.js";
@@ -128,9 +129,10 @@ export const getItemsByPath = (collection, paths) => {
  * If the slug is not found, the build will fail with an error indicating
  * the problematic slug - this catches data errors early.
  *
- * @param {import("@11ty/eleventy").UserConfig} eleventyConfig
+ * @param {import("#lib/types").UserConfig} eleventyConfig
  */
-export const configureCollectionLookup = (eleventyConfig) => {
-  eleventyConfig.addFilter("getBySlug", getBySlug);
-  eleventyConfig.addFilter("getItemsByPath", getItemsByPath);
-};
+export const configureCollectionLookup = (eleventyConfig) =>
+  registerFilters(eleventyConfig)({
+    getBySlug,
+    getItemsByPath,
+  });

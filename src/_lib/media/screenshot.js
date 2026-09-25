@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- shared browser automation import block */
 import {
   BROWSER_ARGS,
   createBatchRunner,
@@ -12,12 +13,16 @@ import {
   runBatchOperations,
 } from "#media/browser-utils.js";
 
+/* jscpd:ignore-end */
+
+/* jscpd:ignore-start -- declaration data: viewport spec table */
 const VIEWPORTS = frozenObject({
   mobile: { width: 375, height: 667, name: "mobile" },
   tablet: { width: 768, height: 1024, name: "tablet" },
   desktop: { width: 1280, height: 800, name: "desktop" },
   "full-page": { width: 1280, height: 4000, name: "full-page" },
 });
+/* jscpd:ignore-end */
 
 const DEFAULT_OPTIONS = frozenObject({
   viewport: "desktop",
@@ -45,7 +50,7 @@ export const buildViewportSuffix = (viewport) =>
  * @param {string} viewport
  * @param {{ timeout?: number }} options
  */
-export const takeScreenshotWithPlaywright = async (
+const takeScreenshotWithPlaywright = async (
   url,
   outputPath,
   viewport,
@@ -87,6 +92,8 @@ export const takeScreenshotWithPlaywright = async (
 };
 
 /**
+ * Capture a page screenshot by running the Playwright pipeline in
+ * takeScreenshotWithPlaywright against the page's capture context.
  * @param {string} pagePath
  * @param {object} [options]
  */

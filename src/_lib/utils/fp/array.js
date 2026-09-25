@@ -123,16 +123,6 @@ const propGetter = (key) => (obj) => obj[key];
 const unique = (arr) => [...new Set(arr)];
 
 /**
- * Remove duplicates by key extraction function
- * @template T, K
- * @param {(item: T) => K} getKey - Key extraction function
- * @returns {(arr: T[]) => T[]} Function that deduplicates array by key
- */
-const uniqueBy = (getKey) => (arr) => [
-  ...new Map(arr.map((item) => [getKey(item), item])).values(),
-];
-
-/**
  * Curried join function
  * @param {string} separator - Separator string
  * @returns {(arr: string[]) => string} Function that joins array
@@ -173,22 +163,6 @@ const filterMap = (predicate, transform) => (arr) =>
   arr.flatMap((item) => (predicate(item) ? [transform(item)] : []));
 
 /**
- * Create a picker function for the specified keys (curried form)
- *
- * Returns a function that extracts only the specified keys from an object.
- * This curried form works perfectly with map(): arr.map(pick(['a', 'b']))
- *
- * @param {string[]} keys - Keys to include
- * @returns {(obj: Record<string, unknown>) => Record<string, unknown>} Function that picks the specified keys present on the object
- *
- * @example
- * pick(['a', 'c'])({ a: 1, b: 2, c: 3 })  // { a: 1, c: 3 }
- * users.map(pick(['name', 'age']))        // picks name & age from each
- */
-const pick = (keys) => (obj) =>
-  Object.fromEntries(keys.flatMap((k) => (k in obj ? [[k, obj[k]]] : [])));
-
-/**
  * Remove falsy values from an array
  *
  * Filters out null, undefined, false, 0, '', and NaN.
@@ -204,29 +178,6 @@ const pick = (keys) => (obj) =>
  * compact([condition && 'value', 'always']) // conditionally includes 'value'
  */
 const compact = (arr) => arr.flatMap((value) => (value ? [value] : []));
-
-/**
- * Find the first duplicate item in an array
- *
- * Returns the first item whose key matches a previous item's key.
- * Returns undefined if no duplicates exist.
- *
- * Uses pure functional approach with no mutable state.
- *
- * @template T
- * @param {T[]} items - Array to check for duplicates
- * @param {(item: T) => unknown} [getKey] - Optional key extractor (defaults to identity)
- * @returns {T | undefined} First duplicate item, or undefined
- *
- * @example
- * findDuplicate([1, 2, 1])                              // 1
- * findDuplicate([{id: 1}, {id: 2}, {id: 1}], x => x.id) // {id: 1} (at index 2)
- * findDuplicate([1, 2, 3])                              // undefined
- */
-const findDuplicate = (items, getKey = (x) => x) => {
-  const keys = items.map(getKey);
-  return items.find((_, i) => keys.indexOf(keys[i]) !== i);
-};
 
 /**
  * Create a membership predicate factory with configurable negation.
@@ -362,19 +313,18 @@ const pluralize = (singular, plural) => {
   return (count) => (count === 1 ? `1 ${singular}` : `${count} ${pluralForm}`);
 };
 
+/* jscpd:ignore-start -- declaration data: exported name list */
 export {
   compact,
   exclude,
   filter,
   filterMap,
-  findDuplicate,
   flatMap,
   join,
   map,
   mapAsync,
   memberOf,
   notMemberOf,
-  pick,
   pipe,
   pluralize,
   reduce,
@@ -382,5 +332,5 @@ export {
   sortBy,
   split,
   unique,
-  uniqueBy,
 };
+/* jscpd:ignore-end */

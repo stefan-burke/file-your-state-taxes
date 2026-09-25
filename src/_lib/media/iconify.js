@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import socialIcons from "#data/social-icons.json" with { type: "json" };
+import { registerFilters } from "#eleventy/register.js";
 import { createHtml } from "#utils/dom-builder.js";
 import { dedupeAsync } from "#utils/fp/memoize.js";
 
@@ -141,10 +142,14 @@ const socialIcon = async (platform, baseDir) => {
  *
  * Icons are cached to src/assets/icons/iconify/ and can be committed to git.
  *
- * @param {import("@11ty/eleventy").UserConfig} eleventyConfig - Eleventy configuration object
+ * @param {import("#lib/types").UserConfig} eleventyConfig - Eleventy configuration object
  */
-export const configureIconify = (eleventyConfig) => {
-  eleventyConfig.addAsyncFilter("icon", getIcon);
-  eleventyConfig.addAsyncFilter("renderIcon", renderIcon);
-  eleventyConfig.addAsyncFilter("socialIcon", socialIcon);
-};
+export const configureIconify = (eleventyConfig) =>
+  registerFilters(
+    eleventyConfig,
+    "addAsyncFilter",
+  )({
+    icon: getIcon,
+    renderIcon,
+    socialIcon,
+  });

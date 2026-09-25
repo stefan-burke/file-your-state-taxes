@@ -8,6 +8,7 @@
  */
 
 import strings from "#data/strings.js";
+import { registerFilters } from "#eleventy/register.js";
 import { canonicalUrl } from "#utils/canonical-url.js";
 import { translationForUrl } from "#utils/i18n.js";
 
@@ -16,16 +17,6 @@ const PARENT_URL_MAP = {
   [strings.news_name]: `/${strings.news_permalink_dir}/`,
   [strings.guide_name]: `/${strings.guide_permalink_dir}/`,
 };
-
-/**
- * Append a non-linked title crumb to a crumbs array
- * @param {Array<{label: string, url: string | null}>} crumbs
- * @param {string} title
- */
-const withTitleCrumb = (crumbs, title) => [
-  ...crumbs,
-  { label: title, url: null },
-];
 
 /**
  * The URL of the collection index a page sits under, in the page's own
@@ -94,7 +85,7 @@ const breadcrumbsFilter = (
     ? [home, { label: navigationParent, url: indexUrl }]
     : [home];
 
-  return withTitleCrumb(baseCrumbs, title);
+  return [...baseCrumbs, { label: title, url: null }];
 };
 
 /**
@@ -140,12 +131,16 @@ const withSchemaLanguage = (meta, pageLanguage) => ({
 
 /**
  * Configure breadcrumbs in Eleventy
- * @param {import('@11ty/eleventy').UserConfig} eleventyConfig
+ * @param {import("#lib/types").UserConfig} eleventyConfig
  */
 const configureBreadcrumbs = (eleventyConfig) => {
-  eleventyConfig.addFilter("breadcrumbsFilter", breadcrumbsFilter);
-  eleventyConfig.addFilter("withSchemaBreadcrumbs", withSchemaBreadcrumbs);
-  eleventyConfig.addFilter("withSchemaLanguage", withSchemaLanguage);
+  /* jscpd:ignore-start -- declaration data: registered filter map */
+  registerFilters(eleventyConfig)({
+    breadcrumbsFilter,
+    withSchemaBreadcrumbs,
+    withSchemaLanguage,
+  });
+  /* jscpd:ignore-end */
 };
 
 export {

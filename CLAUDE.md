@@ -19,7 +19,7 @@ This is the canonical handwritten engineering policy and workflow. Consult:
 2. Make the smallest correct change. Prefer existing helpers and clear, small functions over new abstractions or duplicated logic.
 3. Add behavioral tests using the canonical test criteria and the shared helpers exported by `#test/test-utils.js`.
 4. Run focused tests while iterating, then the relevant quality gates and lint. Regenerate affected artifacts and check the diff.
-5. Run the full `npm test` once at the end before committing. Report commands, results, and any verification that could not run. Commit only when requested.
+5. Run the full `npm run test` once at the end before committing. Report commands, results, and any verification that could not run. Commit only when requested.
 
 Use **npm** for all package management. Install with `npm install`; see the
 generated reference for the current Node requirement and command definitions. Do
@@ -27,15 +27,16 @@ not describe scripts from memory.
 
 ## Code Policy
 
-- Repository paths come from `ROOT_DIR` in `#lib/paths.js`, not `process.cwd()`.
+- Use Node subpath import aliases from `package.json` wherever an alias applies, including dynamic and side-effect imports. Repository paths come from `ROOT_DIR` in `#lib/paths.js`, not `process.cwd()`.
 - Prefer arrow functions, `const`, curried helpers, and immutable transformations: `map`/`filter` for transformations, `flatMap` for combined filtering/expansion, `reduce` for aggregation, and `Object.fromEntries` for object construction. Use `pipe` when it makes a transformation clearer; do not force composition or extract helpers solely to add indirection.
 - `.push()` and other mutation-style escapes are gated by `test/unit/code-quality/` tests with distinct scopes, exempt directories, and allowlists. Read the failing gate before choosing an implementation, including inside reducers.
 - Biome and code-quality tests are complementary. Read `biome.json` for actual Biome limits and overrides, not an invented universal scope. Do not broaden enforcement or weaken checks merely to accommodate a change.
-- Keep HTML rendering in templates under `src/_includes/`; use existing block, shortcode, and filter registration patterns.
+- Keep HTML rendering in templates under `src/_includes/`; use existing block, shortcode, and filter registration patterns. Remove dead/commented-out code rather than retaining it as documentation.
 
 Generic functional helpers live under `#utils/fp/`; consult the generated export
 index and source JSDoc for APIs rather than copying stale utility inventories.
-Use reference-based caching for collection lookups where appropriate.
+Create cached helpers at module scope so calls reuse the cache; use
+reference-based caching for collection lookups where appropriate.
 
 ### Fail Fast, Never Mask
 
@@ -53,7 +54,9 @@ validation without weakening the gates.
 `test/code-quality/code-quality-exceptions.js` is a deletion-only legacy baseline,
 not a place to approve new violations: a per-entry ratchet fails on any entry the
 baseline has not recorded, and deletions must be locked into the baseline it
-prints; each gate also reports stale entries. If a check appears wrong,
+prints; suggested updates only remove recorded entries and never approve new
+ones. A genuine file rename or shifted line requires an explicitly reviewed
+baseline update. Each gate also reports stale entries. If a check appears wrong,
 demonstrate the false positive and discuss a targeted correction; do not add
 exceptions or convert thrown failures to default values.
 
@@ -64,15 +67,19 @@ helpers live in `test/test-utils/` and are re-exported by `#test/test-utils.js`.
 Use them to exercise production behavior and isolate resources. Follow
 [all mandatory test criteria](test/TEST-QUALITY-CRITERIA.md).
 
-**Do not run `npm test` repeatedly to diagnose one issue.** Start with a file,
-test name, or subsystem:
+**Do not run `npm run test` repeatedly to diagnose one issue.** Start with a
+file, test name, or subsystem:
 
 ```sh
-npx vitest run test/unit/utils/slug-utils.test.js
-npx vitest run test/unit/utils/slug-utils.test.js -t "specific test name"
-npx vitest run test/unit/collections/
-npx vitest run test/unit/code-quality/
+node node_modules/vitest/vitest.mjs run test/unit/utils/slug-utils.test.js
+node node_modules/vitest/vitest.mjs run test/unit/utils/slug-utils.test.js -t "specific test name"
+node node_modules/vitest/vitest.mjs run test/unit/collections/
+node node_modules/vitest/vitest.mjs run test/unit/code-quality/
 ```
+
+Invoke vitest through `node` and npm through `npm run` as shown: agent
+permission profiles allow `node`, `npm run`, `npm install`, and `npm ci`, but
+not `npx` or bare `npm` forms such as `npm test`.
 
 For lint, use `npm run lint` and `npm run lint:fix`, or scope the repository's
 Biome runner to changed JavaScript files: `node scripts/biome.js check <paths>`.
