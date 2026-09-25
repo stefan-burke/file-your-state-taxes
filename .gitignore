@@ -146,6 +146,9 @@ _site
 # ---> Direnv
 .direnv
 
+# ---> Devenv (devenv.sh local state; knip scans it otherwise)
+.devenv
+
 # ---> Test artifacts
 test/.test-sites/
 test/temp-*
