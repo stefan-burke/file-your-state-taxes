@@ -1,11 +1,14 @@
 import { describe, expect, test } from "vitest";
 import {
   configureGuides,
+  createGuideCategoriesCollection,
+  createGuidePagesCollection,
   generalGuides,
   guidesByCategory,
   guidesForProperty,
 } from "#collections/guides.js";
 import {
+  collectionApi,
   createMockEleventyConfig,
   expectResultTitles,
 } from "#test/test-utils.js";
@@ -135,6 +138,38 @@ describe("guides", () => {
     configureGuides(mockConfig);
 
     expect(mockConfig.filters.guidesForProperty).toBe(guidesForProperty);
+  });
+
+  test("Registers the guide-pages collection on Eleventy config", () => {
+    const mockConfig = createMockEleventyConfig();
+
+    configureGuides(mockConfig);
+
+    expect(mockConfig.collections["guide-pages"]).toBe(
+      createGuidePagesCollection,
+    );
+  });
+
+  test("Registers the guide-categories collection on Eleventy config", () => {
+    const mockConfig = createMockEleventyConfig();
+
+    configureGuides(mockConfig);
+
+    expect(mockConfig.collections["guide-categories"]).toBe(
+      createGuideCategoriesCollection,
+    );
+  });
+
+  test("guide-pages collection keeps every guide page in order", () => {
+    const pages = [
+      { data: { name: "First", tags: ["guide-pages"] } },
+      { data: { name: "Hidden", tags: ["guide-pages"], no_index: true } },
+      { data: { name: "Last", tags: ["guide-pages"] } },
+    ];
+
+    const result = createGuidePagesCollection(collectionApi(pages));
+
+    expectResultTitles(result, ["First", "Hidden", "Last"]);
   });
 });
 

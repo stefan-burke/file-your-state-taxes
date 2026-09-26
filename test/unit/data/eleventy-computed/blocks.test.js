@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import eleventyComputed from "#data/eleventyComputed.js";
+import { BLOCK_EXAMPLES } from "#utils/block-schema.js";
 
 const page = { inputPath: "test.html" };
 const name = "Test Item";
@@ -183,7 +184,9 @@ describe("eleventyComputed.blocks block gallery", () => {
       name,
     });
 
-    expect(blocks.length).toBeGreaterThan(100);
+    // Hero, then two blocks per type: a YAML source with an intro title and
+    // the live example.
+    expect(blocks.length).toBe(1 + 2 * BLOCK_EXAMPLES.length);
     expect(blocks[0].type).toBe("hero");
     // Defaults are applied to the generated blocks like any others
     expect(blocks.every((block) => "dark" in block)).toBe(true);

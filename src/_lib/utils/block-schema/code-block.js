@@ -1,9 +1,10 @@
 /* jscpd:ignore-start -- block schema declaration data */
-import { str } from "#utils/block-schema/shared.js";
+import { INTRO_CONTENT_FIELD, str } from "#utils/block-schema/shared.js";
 
 export const type = "code-block";
 
 export const fields = {
+  intro_content: INTRO_CONTENT_FIELD,
   filename: {
     ...str("Filename"),
     required: true,
@@ -34,6 +35,7 @@ export const docs = {
 
 export const example = {
   type: "code-block",
+  intro_content: "## Commands to get started",
   filename: "quick-start.sh",
   language: "bash",
   code: "npm install\nnpm run serve",

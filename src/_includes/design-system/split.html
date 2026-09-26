@@ -35,7 +35,12 @@ Parameters (via block object):
           <figcaption>{{ block.figure_caption }}</figcaption>
         {%- endif -%}
       {%- when "split-code" -%}
-        {%- include "design-system/blocks/code-block.html", filename: block.figure_filename, code: block.figure_code, language: block.figure_language -%}
+        {%- comment -%}
+          block: false severs block provenance: this figure is rendered from
+          figure_* fields, not a code-block instance, so the standalone
+          intro_content (and block-driven defaults) do not apply.
+        {%- endcomment -%}
+        {%- include "design-system/blocks/code-block.html", block: false, filename: block.figure_filename, code: block.figure_code, language: block.figure_language -%}
       {%- when "split-icon-links" -%}
         {%- include "design-system/blocks/icon-links.html", items: block.figure_items -%}
       {%- when "split-html" -%}

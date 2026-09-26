@@ -60,8 +60,8 @@ export const docs = {
 
 export const example = {
   type: "iframe-embed",
-  src: "/news/",
-  name: "The news page, embedded",
+  src: "/search/",
+  name: "The search page, embedded",
   aspect_ratio: "16/9",
   max_width: "560px",
 };

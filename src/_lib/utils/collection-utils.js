@@ -21,15 +21,17 @@ export const createFieldIndexer = (field) =>
   });
 
 /**
- * Create a collection builder that filters by tag, excludes items where a
- * boolean field is true, and sorts. Used by news, etc.
+ * Create a collection builder that filters by tag, optionally excludes items
+ * where a boolean data field is true, and sorts when a comparator is given.
+ * Used by news, etc. With no extra arguments, every tagged item is kept in
+ * collection (build) order.
  * @param {string} tag - Eleventy tag to filter by
- * @param {string} hideField - Boolean data field; items where it is true are excluded
- * @param {(a: any, b: any) => number} sortFn - Sort comparator
+ * @param {string} [hideField] - Boolean data field; items where it is true are excluded
+ * @param {(a: any, b: any) => number} [sortFn] - Sort comparator
  * @returns {(collectionApi: import("#lib/types").EleventyCollectionApi) => any[]}
  */
 export const createTagCollection = (tag, hideField, sortFn) => (api) =>
   api
     .getFilteredByTag(tag)
-    .filter((item) => item.data[hideField] !== true)
+    .filter((item) => (hideField ? item.data[hideField] !== true : true))
     .sort(sortFn);

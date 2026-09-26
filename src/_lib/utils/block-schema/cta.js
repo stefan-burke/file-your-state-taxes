@@ -33,6 +33,6 @@ export const example = {
   type: "cta",
   content:
     "## Ready to try it?\n\nA call-to-action closes the page with one clear next step.",
-  button: { text: "Read the guides", href: "/guide/", size: "lg" },
+  button: { text: "How it works", href: "/how-it-works/", size: "lg" },
 };
 /* jscpd:ignore-end */

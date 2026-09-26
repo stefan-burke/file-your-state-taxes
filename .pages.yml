@@ -40,6 +40,9 @@ components:
     fields:
       - { name: dark, type: boolean, label: Dark }
       - { name: compact, type: boolean, label: Compact }
+      - name: intro_content
+        type: rich-text
+        label: Intro Content (Markdown)
       - { name: filename, type: string, label: Filename, required: true }
       - { name: code, type: string, label: Code, required: true }
       - { name: language, type: string, label: Language }

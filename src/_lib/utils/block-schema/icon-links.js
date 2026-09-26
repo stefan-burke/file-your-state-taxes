@@ -42,8 +42,8 @@ export const example = {
   type: "icon-links",
   intro_content: "## Links with icons",
   items: [
-    { icon: "hugeicons:book-02", text: "Read the guides", url: "/guide/" },
-    { icon: "hugeicons:news", text: "Latest news", url: "/news/" },
+    { icon: "hugeicons:book-02", text: "How it works", url: "/how-it-works/" },
+    { icon: "hugeicons:cube", text: "Browse the blocks", url: "/blocks/" },
     { icon: "hugeicons:search-01", text: "Search the site", url: "/search/" },
   ],
 };

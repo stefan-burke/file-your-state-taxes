@@ -3,7 +3,10 @@ Code block with terminal-style header and decorative dots.
 
 Accepts either direct parameters or a block object:
   Direct: filename, code, language, reveal
-  Block:  block.filename, block.code, block.language, block.reveal
+  Block:  block.intro_content, block.filename, block.code, block.language,
+          block.reveal
+
+  - block.intro_content: Optional markdown intro rendered above the code block.
 
 Usage (direct params - used by split figure):
   {% include "design-system/blocks/code-block.html",
@@ -15,6 +18,8 @@ Usage (block object - used by standalone code-block type):
      block: { filename: "example.js", code: "const x = 1;" }
   %}
 {%- endcomment -%}
+
+{%- include "design-system/block-intro.html" -%}
 
 {%- assign _filename = filename | default: block.filename -%}
 {%- assign _code = code | default: block.code -%}

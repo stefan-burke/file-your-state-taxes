@@ -34,7 +34,7 @@ export const example = {
       image: "breakfast.jpg",
       name: "Breakfast",
       description: "Cards pair an image with a name and description.",
-      link: "/news/",
+      link: "/how-it-works/",
     },
     {
       image: "lunch.jpg",

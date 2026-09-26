@@ -57,8 +57,12 @@ export const example = {
   type: "split-full",
   variant: "dark-left",
   left_content: "## Two panels\n\nEach side takes its own content and button.",
-  left_button: { text: "Left action", href: "/guide/", variant: "secondary" },
+  left_button: {
+    text: "Left action",
+    href: "/how-it-works/",
+    variant: "secondary",
+  },
   right_content: "## Side by side\n\nVariants control which side is dark.",
-  right_button: { text: "Right action", href: "/news/" },
+  right_button: { text: "Right action", href: "/blocks/" },
 };
 /* jscpd:ignore-end */

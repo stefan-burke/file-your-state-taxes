@@ -38,7 +38,7 @@ const ALLOWED_TRY_CATCHES = frozenSet([
 
   // test/integration/pages-yml-validation.test.js - Git clone may fail in offline environments
   // Needed: gracefully skips validation when GitHub is not reachable
-  "test/integration/pages-yml-validation.test.js:30",
+  "test/integration/pages-yml-validation.test.js:45",
 
   // Pre-existing catches surfaced when this gate's coverage was extended to
   // scripts/ and bin/ - baseline entries, not new debt. Each one handles the

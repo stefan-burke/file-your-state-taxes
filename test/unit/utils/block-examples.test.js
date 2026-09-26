@@ -53,10 +53,13 @@ describe("buildGalleryBlocks", () => {
 
   test("opens with a hero and emits one section per block type", () => {
     expect(gallery[0].type).toBe("hero");
-    // The section-header example is itself a live section-header, so count
-    // only the gallery's own intros (their heading is the backticked type).
+    // Each type gets exactly one code-block whose intro_content carries the
+    // backticked type name as the section title.
     const intros = gallery.filter(
-      (b) => b.type === "section-header" && b.intro.startsWith("## `"),
+      (b) =>
+        b.type === "code-block" &&
+        b.filename?.endsWith(".yaml") &&
+        b.intro_content?.startsWith("## `"),
     );
     expect(intros.length).toBe(BLOCK_EXAMPLES.length);
   });

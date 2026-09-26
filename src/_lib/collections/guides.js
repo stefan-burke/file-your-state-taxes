@@ -1,5 +1,8 @@
 import { registerFilters } from "#eleventy/register.js";
-import { createFieldIndexer } from "#utils/collection-utils.js";
+import {
+  createFieldIndexer,
+  createTagCollection,
+} from "#utils/collection-utils.js";
 import { normaliseSlug } from "#utils/slug-utils.js";
 
 /** Index guides by category for O(1) lookups, cached per guides array */
@@ -42,6 +45,18 @@ const guidesForProperty = (guides, propertySlug) => {
   });
 };
 
+/**
+ * The guide collections are registered by the library rather than only by
+ * the demo content directory tags, so a child site can delete
+ * `src/guide-pages` and `src/guide-categories` without unregistering the
+ * collections that shared block templates reference. Both handlers keep the
+ * plain tag-collection behavior: every tagged item, in build order.
+ *
+ * @type {(api: import("#lib/types").EleventyCollectionApi) => import("#lib/types").EleventyCollectionItem[]}
+ */
+const createGuidePagesCollection = createTagCollection("guide-pages");
+const createGuideCategoriesCollection = createTagCollection("guide-categories");
+
 /** @param {*} eleventyConfig */
 const configureGuides = (eleventyConfig) => {
   /* jscpd:ignore-start -- declaration data: registered filter map */
@@ -51,6 +66,18 @@ const configureGuides = (eleventyConfig) => {
     guidesForProperty,
   });
   /* jscpd:ignore-end */
+  eleventyConfig.addCollection("guide-pages", createGuidePagesCollection);
+  eleventyConfig.addCollection(
+    "guide-categories",
+    createGuideCategoriesCollection,
+  );
 };
 
-export { configureGuides, generalGuides, guidesByCategory, guidesForProperty };
+export {
+  configureGuides,
+  createGuideCategoriesCollection,
+  createGuidePagesCollection,
+  generalGuides,
+  guidesByCategory,
+  guidesForProperty,
+};

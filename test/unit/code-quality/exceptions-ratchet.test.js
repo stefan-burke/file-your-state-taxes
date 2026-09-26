@@ -48,7 +48,7 @@ const RATCHET_BASELINE = {
     "scripts/mutation/runner.js",
     "scripts/mutation/summary.js:219",
     "test/ensure-deps.js:16",
-    "test/integration/pages-yml-validation.test.js:30",
+    "test/integration/pages-yml-validation.test.js:45",
     "test/test-utils/assertions.js",
   ],
 };

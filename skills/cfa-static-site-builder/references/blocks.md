@@ -195,7 +195,7 @@ blocks:
       - image: breakfast.jpg
         name: Breakfast
         description: Cards pair an image with a name and description.
-        link: /news/
+        link: /how-it-works/
       - image: lunch.jpg
         name: Lunch
         description: Images get responsive srcset and LQIP placeholders.
@@ -268,6 +268,7 @@ Terminal-style code display with macOS-like toolbar header.
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
+| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
 | `filename` | `string` | **required** | Not documented | Filename | Displayed in the toolbar header. |
 | `code` | `string` | **required** | Not documented | Code | Code content. Rendered in \`\<pre>\<code>\`. |
 | `language` | `string` | optional | Not documented | Language | Sets \`data-language\` attribute (for future syntax highlighting). |
@@ -278,6 +279,7 @@ Terminal-style code display with macOS-like toolbar header.
 ```yaml
 blocks:
   - type: code-block
+    intro_content: "## Commands to get started"
     filename: quick-start.sh
     language: bash
     code: |-
@@ -331,11 +333,11 @@ blocks:
       the actions that matter.
     buttons:
       - text: Primary action
-        href: /guide/
+        href: /how-it-works/
         variant: primary
         size: lg
       - text: Secondary
-        href: /news/
+        href: /blocks/
         variant: secondary
         size: lg
 ```
@@ -499,11 +501,11 @@ blocks:
       Each link gets an icon.
     figure_items:
       - icon: hugeicons:book-02
-        text: Guides
-        url: /guide/
-      - icon: hugeicons:news
-        text: News
-        url: /news/
+        text: How it works
+        url: /how-it-works/
+      - icon: hugeicons:cube
+        text: Blocks
+        url: /blocks/
       - icon: hugeicons:search-01
         text: Search
         url: /search/
@@ -658,7 +660,7 @@ blocks:
       Each side takes its own content and button.
     left_button:
       text: Left action
-      href: /guide/
+      href: /how-it-works/
       variant: secondary
     right_content: |-
       ## Side by side
@@ -666,7 +668,7 @@ blocks:
       Variants control which side is dark.
     right_button:
       text: Right action
-      href: /news/
+      href: /blocks/
 ```
 
 ## `cta`
@@ -709,8 +711,8 @@ blocks:
 
       A call-to-action closes the page with one clear next step.
     button:
-      text: Read the guides
-      href: /guide/
+      text: How it works
+      href: /how-it-works/
       size: lg
 ```
 
@@ -1109,8 +1111,8 @@ Third-party iframe embed (itch.io widgets, Buttondown, Bandcamp, Stripe buttons,
 ```yaml
 blocks:
   - type: iframe-embed
-    src: /news/
-    name: The news page, embedded
+    src: /search/
+    name: The search page, embedded
     aspect_ratio: 16/9
     max_width: 560px
 ```
@@ -1488,11 +1490,11 @@ blocks:
     intro_content: "## Links with icons"
     items:
       - icon: hugeicons:book-02
-        text: Read the guides
-        url: /guide/
-      - icon: hugeicons:news
-        text: Latest news
-        url: /news/
+        text: How it works
+        url: /how-it-works/
+      - icon: hugeicons:cube
+        text: Browse the blocks
+        url: /blocks/
       - icon: hugeicons:search-01
         text: Search the site
         url: /search/

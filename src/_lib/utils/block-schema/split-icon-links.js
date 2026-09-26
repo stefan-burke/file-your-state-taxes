@@ -28,8 +28,8 @@ export const example = {
   subtitle: "Split layouts",
   content: "## Text beside a list of links\n\nEach link gets an icon.",
   figure_items: [
-    { icon: "hugeicons:book-02", text: "Guides", url: "/guide/" },
-    { icon: "hugeicons:news", text: "News", url: "/news/" },
+    { icon: "hugeicons:book-02", text: "How it works", url: "/how-it-works/" },
+    { icon: "hugeicons:cube", text: "Blocks", url: "/blocks/" },
     { icon: "hugeicons:search-01", text: "Search", url: "/search/" },
   ],
 };

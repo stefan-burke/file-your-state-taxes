@@ -33,8 +33,13 @@ export const example = {
   content:
     "# A full-width opening banner\n\nStart most pages with one of these: a heading, a sentence of context, and the actions that matter.",
   buttons: [
-    { text: "Primary action", href: "/guide/", variant: "primary", size: "lg" },
-    { text: "Secondary", href: "/news/", variant: "secondary", size: "lg" },
+    {
+      text: "Primary action",
+      href: "/how-it-works/",
+      variant: "primary",
+      size: "lg",
+    },
+    { text: "Secondary", href: "/blocks/", variant: "secondary", size: "lg" },
   ],
 };
 /* jscpd:ignore-end */
