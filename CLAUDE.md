@@ -32,6 +32,7 @@ not describe scripts from memory.
 - `.push()` and other mutation-style escapes are gated by `test/unit/code-quality/` tests with distinct scopes, exempt directories, and allowlists. Read the failing gate before choosing an implementation, including inside reducers.
 - Biome and code-quality tests are complementary. Read `biome.json` for actual Biome limits and overrides, not an invented universal scope. Do not broaden enforcement or weaken checks merely to accommodate a change.
 - Keep HTML rendering in templates under `src/_includes/`; use existing block, shortcode, and filter registration patterns. Remove dead/commented-out code rather than retaining it as documentation.
+- Stacked containers such as `.prose`, `.block-column`, and `.hero` space their children with a flex `gap`. Change spacing by overriding the gap. Do not add vertical margins to the children: a child margin adds to the gap, so the spacing doubles. The one exception is extra space before a section, and that rule's comment must show the sum, for example `25px gap + 35px = 60px`.
 
 Generic functional helpers live under `#utils/fp/`; consult the generated export
 index and source JSDoc for APIs rather than copying stale utility inventories.

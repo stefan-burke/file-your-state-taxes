@@ -4,6 +4,12 @@
 // jscpd:ignore-end
 
 // Rich text content container. Inherits stack layout (flex-col with gap).
+//
+// .prose spaces its children with a flex gap. Do not add top or bottom
+// margins to children (p, ul, li, headings): a margin adds to the gap, so
+// the spacing doubles. To change the spacing, override the gap. Extra space
+// before one section is allowed, but the rule's comment must show the sum,
+// for example "25px gap + 35px = 60px".
 
 .design-system {
   .prose {
