@@ -310,7 +310,7 @@ Full-width hero banner with optional badge, markdown content, and action buttons
 | Field | Schema type | Presence | Documented default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
 | `badge` | `string` | optional | Not documented | Badge Text | Small pill label above the content. Renders as \`\<span class="badge">\`. |
-| `content` | `markdown` | **required** | Not documented | Content | Markdown content rendered in \`.prose\`. Start with a \`# Heading\`; paragraphs get \`body-lg\` size, muted color, max-width \`$width-narrow\` (680px). |
+| `content` | `markdown` | **required** | Not documented | Content | Markdown content rendered in \`.prose\`. Start with a \`# Heading\`; paragraphs get \`body-lg\` size and muted color in a centered, guttered measure. |
 | `buttons` | `array<object>` | optional | Not documented | Buttons | Action buttons below the content. Each: \`{text, href, variant, size}\`. Variants: \`"primary"\` (filled), \`"secondary"\` (outlined), \`"ghost"\` (transparent). Sizes: \`"sm"\`, \`"lg"\`, or omit for default. |
 | `buttons[].text` | `string` | **required** | Not documented | Button Text |  |
 | `buttons[].href` | `string` | **required** | Not documented | URL |  |

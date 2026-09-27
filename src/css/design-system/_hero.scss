@@ -17,10 +17,14 @@
 
     .prose {
       align-items: center;
-      max-width: $width-default;
+
+      // 900px measure plus a 24px gutter each side: with the hero's own
+      // 24px self-padding, text sits at least 48px from the hero's edges.
+      max-width: calc(#{$width-default} + 2 * #{$space-md});
+      padding-inline: $space-md;
 
       p {
-        @include lead-paragraph;
+        @include body-lg;
         @include muted-text;
       }
     }

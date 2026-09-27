@@ -11,7 +11,7 @@ export const fields = {
     ...HERO_CONTENT_FIELDS.content,
     required: true,
     description:
-      "Markdown content rendered in `.prose`. Start with a `# Heading`; paragraphs get `body-lg` size, muted color, max-width `$width-narrow` (680px).",
+      "Markdown content rendered in `.prose`. Start with a `# Heading`; paragraphs get `body-lg` size and muted color in a centered, guttered measure.",
   },
   class: {
     ...str("CSS Class"),

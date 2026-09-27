@@ -344,14 +344,6 @@
   color: var(--color-text-muted);
 }
 
-// Lead paragraph inside intro blocks (hero, CTA): large body text in a
-// narrow measure.
-@mixin lead-paragraph {
-  @include body-lg;
-
-  max-width: $width-narrow;
-}
-
 // Text balance for headings
 @mixin text-balance {
   text-wrap: balance;
@@ -872,10 +864,6 @@
     .prose {
       align-items: center;
       max-width: $width-default;
-
-      p {
-        max-width: $width-narrow;
-      }
     }
 
     h1, h2, h3, h4, h5, h6 {

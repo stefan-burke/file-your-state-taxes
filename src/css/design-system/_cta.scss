@@ -18,11 +18,15 @@
     @include brand-gradient;
     @include contrast-text-vars;
 
-    p {
-      @include lead-paragraph;
+    // The gradient card lives in a 1200px container; the prose measure keeps
+    // the text (heading and paragraphs) in one centered column inside it.
+    .prose {
+      max-width: $width-narrow;
+    }
 
-      margin-right: auto;
-      margin-left: auto;
+    p {
+      @include body-lg;
+
       opacity: 0.9;
     }
 
