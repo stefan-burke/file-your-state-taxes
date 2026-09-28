@@ -1,4 +1,5 @@
 /** Pure block documentation rendering, shared by the CLI and freshness tests. */
+/* jscpd:ignore-start -- import block */
 import { stringify } from "yaml";
 import { componentNameFor } from "#scripts/customise-cms/blocks.js";
 import {
@@ -7,7 +8,6 @@ import {
   inlineCode,
   markdownTable,
 } from "#scripts/lib/markdown.js";
-import { isColumnSafeType } from "#utils/block-columns.js";
 import { CONTAINER_FIELDS } from "#utils/block-schema/shared.js";
 import {
   BLOCK_DOCS,
@@ -15,8 +15,11 @@ import {
   BLOCK_SCHEMAS,
   getBlockContainerWidth,
   getBlockTemplate,
+  isColumnSafeBlock,
   validateBlocks,
 } from "#utils/block-schema.js";
+
+/* jscpd:ignore-end */
 
 /** @typedef {import("#scripts/customise-cms/blocks.js").BlockFieldSchema & { description?: string, allowPipeDelimitedItems?: boolean }} DocField */
 
@@ -35,15 +38,26 @@ const fieldDescription = (field) =>
     .filter(Boolean)
     .join(" ");
 
+/**
+ * Typed defaults render as their YAML-equivalent JSON literal; a function
+ * default derives its value from the owning object, which the field
+ * description explains.
+ * @param {unknown} value
+ */
+const renderDefault = (value) => {
+  if (value === undefined) return "None";
+  if (typeof value === "function") return "Derived";
+  return inlineCode(JSON.stringify(value));
+};
+
 /** @param {string} path @param {DocField} field */
 const renderFieldRow = (path, field) => {
   const type = field.list ? `array<${field.type}>` : field.type;
-  const defaultText = field.default === "" ? '""' : field.default;
   return [
     inlineCode(path),
     inlineCode(type),
     field.required ? "**required**" : "optional",
-    defaultText === undefined ? "Not documented" : inlineCode(defaultText),
+    renderDefault(field.default),
     field.label === undefined ? "Not exposed" : escapeText(field.label),
     escapeText(fieldDescription(field)),
   ];
@@ -71,19 +85,12 @@ const fieldRows =
  */
 export const renderFieldTable = (fields) =>
   markdownTable(
-    [
-      "Field",
-      "Schema type",
-      "Presence",
-      "Documented default",
-      "CMS label",
-      "Description",
-    ],
+    ["Field", "Schema type", "Presence", "Default", "CMS label", "Description"],
     Object.entries(fields).flatMap(fieldRows()),
   );
 
 /** @param {string} type */
-const columnCompatibility = (type) => (isColumnSafeType(type) ? "Yes" : "No");
+const columnCompatibility = (type) => (isColumnSafeBlock(type) ? "Yes" : "No");
 
 /** @param {(typeof BLOCK_EXAMPLES)[number]} entry */
 const validateCanonicalExample = ({ type, example }) => {
@@ -128,8 +135,8 @@ const REFERENCE_INTRO = [
   "Blocks are entries in a YAML frontmatter `blocks:` array. This reference is generated from the full field schemas and canonical `BLOCK_EXAMPLES`, in deliberate registry order. Regenerate with `npm run generate-references`, or `npm run generate-blocks-reference` for this file alone.",
   "See [Layouts](layouts.md) for rendering architecture, column matching, sidebar behavior, and styling. All source paths below are repository-root-relative.",
   "## Reading the schemas",
-  "Schema types retain authoring semantics: `markdown`, `image`, and `reference` store strings; `array<T>` is a list of T. Dotted paths describe nested objects, and `[]` describes each list item. A required child is required only when its optional parent object is supplied (or for each supplied list object). Required fields must be supplied even when a documented default is shown.",
-  "The **Documented default** column reproduces display-text metadata, not executable typed defaults. It neither inserts values into YAML nor changes validation. `Not documented` means no default metadata exists. Copy the canonical examples, not default text, for executable YAML. Descriptions and usage notes may describe contextual/template behavior beyond schema validation.",
+  "Schema types retain authoring semantics: `markdown`, `image`, and `reference` store strings; `array<T>` is a list of T. Dotted paths describe nested objects, and `[]` describes each list item. A required child is required only when its optional parent object is supplied (or for each supplied list object). Required fields must be supplied even when a default is shown.",
+  "The **Default** column shows the value the build fills in when a block omits the field, after validation and before rendering, so templates and authors can rely on it. Defaults of nested fields apply within each supplied parent object. `Derived` defaults depend on another field, as the description explains; `None` means an omitted field stays absent. Descriptions and usage notes may describe contextual/template behavior beyond schema validation.",
   "**CMS collection availability** describes the schema's editor allowlist, not a runtime restriction. Site CMS customization can hide collections or blocks. Contextual blocks may still need page data to render usefully. **CMS label** identifies editor-exposed fields; `Not exposed` fields can still be authored in YAML.",
 ].join("\n\n");
 

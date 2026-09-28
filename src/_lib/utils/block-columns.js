@@ -25,24 +25,12 @@
  *   - Unclaimed blocks fall through to `rest`, preserving original order.
  *   - If no blocks match any column, columns mode is disabled (returns
  *     columns: null so the template falls back to the default layout).
- *   - Full-width types (hero, *-background, marquee-images) and split-* types
- *     are allowed inside `before` but disallowed inside `columns`.
+ *   - Block types whose schema module declares `columnSafe = false` (full-bleed
+ *     and split-* types) are allowed inside `before` but disallowed inside
+ *     `columns`.
  */
 
-// Block types that must not be placed inside a column layout, either because
-// they need full viewport width or because they already use a two-pane layout.
-// Additionally, every `split-*` block type is disallowed (checked dynamically).
-const COLUMN_DISALLOWED_TYPES = [
-  "hero",
-  "video-background",
-  "bunny-video-background",
-  "image-background",
-  "marquee-images",
-];
-
-/** @param {string} type */
-export const isColumnSafeType = (type) =>
-  !COLUMN_DISALLOWED_TYPES.includes(type) && !type.startsWith("split-");
+import { isColumnSafeBlock } from "#utils/block-schema.js";
 
 /**
  * @param {unknown} blocks
@@ -56,7 +44,7 @@ export const toBlockArray = (blocks) => (Array.isArray(blocks) ? blocks : []);
  * @param {string} where - Location description for the error message
  */
 export const assertColumnSafeTypes = (types, where) => {
-  const disallowed = types.find((type) => !isColumnSafeType(type));
+  const disallowed = types.find((type) => !isColumnSafeBlock(type));
   if (disallowed) {
     throw new Error(
       `Block type "${disallowed}" is not supported inside ${where}.`,
@@ -176,10 +164,14 @@ const buildColumns = (safeBlocks, layoutCols, usedBefore) => {
   validateLayoutSlots(columnSlots);
   const columnState = matchSlotsToBlocks(safeBlocks, columnSlots, usedBefore);
   if (columnState.claims.length === 0) return fallback;
-  const columns = layoutCols.map((_, ci) =>
-    columnState.claims
-      .filter((c) => c.ci === ci)
-      .map((c) => safeBlocks[c.blockIndex]),
+  const columns = columnState.claims.reduce(
+    /**
+     * @param {Block[][]} cols
+     * @param {Claim} claim
+     */
+    (cols, { blockIndex, ci }) =>
+      cols.with(ci, [...cols[ci], safeBlocks[blockIndex]]),
+    layoutCols.map(() => []),
   );
   return { columns, used: columnState.used };
 };

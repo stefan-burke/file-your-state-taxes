@@ -38,7 +38,12 @@ no section. A `snippet` is transparent: it adds no section of its own, and its
 inner blocks render through the block pipeline. Other nonempty blocks get a
 `<section>` with optional `dark` and `compact` classes. The `blockContainerWidth`
 filter uses the module's width, defaulting to `wide`; `full` omits the container
-wrapper. See the generated reference for every resolved width and template.
+wrapper.
+
+Before any of this, every authored block array (page frontmatter, `snippet`
+blocks, the footer and sidebar snippets) is validated and has its omitted
+fields filled from the schema `default`s, nested fields included. Templates
+read those values directly rather than restating defaults. See the generated reference for every resolved width and template.
 
 ## Multi-Column Layouts
 
@@ -72,9 +77,10 @@ to a page's first section; footer and nested snippet block arrays also use it.
 
 Use the [generated compatibility table](blocks.md#column-and-sidebar-compatibility)
 to choose column-safe types. Full-viewport and split-layout types are rejected
-in columns; they are allowed in full-width `before` slots. The table derives
-constraints over registered types, so obsolete denylist entries are not offered
-as available blocks. The implementation lives in `src/_lib/utils/block-columns.js`.
+in columns; they are allowed in full-width `before` slots. Each schema module
+opts out with `export const columnSafe = false`, and a layout naming an
+unregistered type fails the build. The implementation lives in
+`src/_lib/utils/block-columns.js`.
 
 Column output uses a `section.block-columns-section`, a `.container-wide`, and
 a `.block-columns.block-columns-N` grid. Each `.block-column` stacks children

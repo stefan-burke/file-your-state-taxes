@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { createTestSite, useSharedSite } from "#test/test-site-factory.js";
+import {
+  createTestSite,
+  pageWithBlocks,
+  useSharedSite,
+} from "#test/test-site-factory.js";
 
 const SIDEBAR_TEXT = "Sidebar contact details";
 const PAGE_BLOCK = { type: "markdown", content: "Page body" };
@@ -17,12 +21,6 @@ const PARTY_IMAGE = {
 const rightContentSnippet = (blocks) => ({
   path: "snippets/right-content.md",
   frontmatter: { blocks },
-});
-
-/** A standalone page carrying the given design-system blocks */
-const pageWithBlocks = (slug, blocks) => ({
-  path: `pages/${slug}.md`,
-  frontmatter: { name: slug, permalink: `/${slug}/`, blocks },
 });
 
 /** The plain + banner page pair every right-content site build shares. */

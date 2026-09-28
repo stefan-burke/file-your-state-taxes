@@ -373,8 +373,10 @@ describe("getBlockContainerWidth", () => {
     expect(getBlockContainerWidth("icon-links")).toBe("narrow");
   });
 
-  test("defaults unknown block types to wide", () => {
-    expect(getBlockContainerWidth("not-a-real-block")).toBe("wide");
+  test("throws on unknown block types", () => {
+    expect(() => getBlockContainerWidth("not-a-real-block")).toThrow(
+      'Unknown block type "not-a-real-block"',
+    );
   });
 });
 

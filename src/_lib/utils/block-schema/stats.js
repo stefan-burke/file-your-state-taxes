@@ -2,6 +2,7 @@
 import {
   INTRO_CONTENT_FIELD,
   objectList,
+  revealToggleField,
   str,
 } from "#utils/block-schema/shared.js";
 
@@ -19,11 +20,7 @@ export const fields = {
       'Stat objects: `{value, label}` or pipe-delimited strings `"value|label"`.',
   },
   intro_content: INTRO_CONTENT_FIELD,
-  reveal: {
-    type: "boolean",
-    default: "true",
-    description: "Adds `data-reveal` to each stat.",
-  },
+  reveal: revealToggleField("each stat"),
 };
 
 export const docs = {

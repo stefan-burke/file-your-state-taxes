@@ -7,6 +7,8 @@ import {
 
 export const type = "marquee-images";
 
+export const columnSafe = false;
+
 export const containerWidth = "full";
 
 export const fields = {
@@ -22,13 +24,13 @@ export const fields = {
   },
   speed: {
     ...str("Scroll Speed (e.g. 30s)"),
-    default: '"30s"',
+    default: "30s",
     description:
       'CSS animation duration for one full scroll cycle (e.g. `"20s"`, `"45s"`). Slower = longer duration.',
   },
   height: {
     ...str("Image Height (e.g. 50px)"),
-    default: '"50px"',
+    default: "50px",
     description:
       'CSS height for the images (e.g. `"60px"`, `"80px"`). Width scales proportionally.',
   },

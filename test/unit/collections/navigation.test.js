@@ -1,4 +1,7 @@
-import { describe, expect, test, vi } from "vitest";
+import fs from "node:fs";
+import { join } from "node:path";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { PAGES_DIR } from "#lib/paths.js";
 import {
   createMockEleventyConfig,
   expectResultTitles,
@@ -25,6 +28,17 @@ const { configureNavigation, toNavigation } = await import(
 const MOCK_SVG = '<svg xmlns="http://www.w3.org/2000/svg"><path/></svg>';
 
 const withIconMock = (callback) => withMockFetch(MOCK_SVG, {}, callback);
+
+// Whether the site publishes a search page is decided by src/pages/search.md,
+// which a fork may delete; each search test states the answer it needs.
+const SEARCH_PAGE_PATH = join(PAGES_DIR, "search.md");
+const realExistsSync = fs.existsSync;
+const setSearchPage = (present) =>
+  vi
+    .spyOn(fs, "existsSync")
+    .mockImplementation((path) =>
+      path === SEARCH_PAGE_PATH ? present : realExistsSync(path),
+    );
 
 const pageItem = (slug, url, tags = []) => ({
   data: { tags },
@@ -119,6 +133,10 @@ describe("configureNavigation wiring", () => {
 });
 
 describe("toNavigation", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   // Every site that publishes a search page has to name its search field, so
   // the tests that are about something else still supply a label.
   const renderNav = (pages, activeKey = "") =>
@@ -130,6 +148,7 @@ describe("toNavigation", () => {
 
   test("renders the search form with a search input and submit button", () =>
     withIconMock(async () => {
+      setSearchPage(true);
       // search.md exists, so toNavigation appends the search item. The form's
       // body is `searchInput + searchButton`; assert both ended up inside it.
       const html = await renderNav([navEntry("Home", { url: "/" })]);
@@ -142,6 +161,7 @@ describe("toNavigation", () => {
     withIconMock(async () => {
       // Both are unlabelled otherwise: the button holds only an icon, and the
       // field only a placeholder.
+      setSearchPage(true);
       const html = await toNavigation(
         [navEntry("Home", { url: "/" })],
         "",
@@ -154,9 +174,20 @@ describe("toNavigation", () => {
 
   test("refuses to render a search field it cannot name", () =>
     withIconMock(async () => {
+      setSearchPage(true);
       await expect(
         toNavigation([navEntry("Home", { url: "/" })], ""),
       ).rejects.toThrow(/search_label/);
+    }));
+
+  test("leaves the search field out when the site has no search page", () =>
+    withIconMock(async () => {
+      setSearchPage(false);
+      // No search page means no field to name, so no label is required.
+      const html = await toNavigation([navEntry("Home", { url: "/" })], "");
+      expect(html).toBe(
+        '<ul class="nav-thumbnails"><li><a href="/"><span>Home</span></a></li></ul>',
+      );
     }));
 
   test("throws when input is missing the eleventyNavigation pluginType", async () => {

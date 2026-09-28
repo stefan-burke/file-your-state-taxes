@@ -31,7 +31,6 @@ import {
   removeStrings,
 } from "#test/code-scanner.js";
 import { SCRIPT_JS_FILES, SRC_JS_FILES } from "#test/test-utils.js";
-import { frozenSet } from "#utils/fp/set.js";
 
 // Match .find( or .filter( — the array lookup methods that suggest linear scans
 const LOOKUP_PATTERN = /\.(?:find|filter)\s*\(/;
@@ -78,13 +77,6 @@ const hasNestedLookupInParens = (cleaned) => {
     return opens - closes > 0;
   });
 };
-
-/**
- * Pre-existing violations surfaced by the expression-arrow detection fix.
- * These are genuine O(n*m) patterns or sub-collection filters in code that
- * predates the scanner improvement. Each should be fixed and removed.
- */
-const KNOWN_VIOLATIONS = frozenSet(["src/_lib/utils/block-columns.js:181"]);
 
 /**
  * Scan source code for .find()/.filter() calls nested inside iteration
@@ -383,11 +375,12 @@ describe("nested-array-lookup", () => {
   });
 
   test("No nested array lookups in source files", () => {
-    const violations = combineFileLists([SRC_JS_FILES(), SCRIPT_JS_FILES()])
-      .flatMap((file) =>
-        findNestedLookups(readSource(file)).map(toViolation(file)),
-      )
-      .filter((v) => !KNOWN_VIOLATIONS.has(`${v.file}:${v.line}`));
+    const violations = combineFileLists([
+      SRC_JS_FILES(),
+      SCRIPT_JS_FILES(),
+    ]).flatMap((file) =>
+      findNestedLookups(readSource(file)).map(toViolation(file)),
+    );
 
     assertNoViolations(violations, {
       singular: "nested array lookup",

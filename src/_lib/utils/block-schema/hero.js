@@ -3,6 +3,8 @@ import { HERO_CONTENT_FIELDS, str } from "#utils/block-schema/shared.js";
 
 export const type = "hero";
 
+export const columnSafe = false;
+
 export const containerWidth = "full";
 
 export const fields = {

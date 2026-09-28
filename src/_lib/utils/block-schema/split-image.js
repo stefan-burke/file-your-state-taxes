@@ -1,18 +1,19 @@
 /* jscpd:ignore-start -- block schema declaration data */
+import { img, str } from "#utils/block-schema/shared.js";
 import {
   SPLIT_BASE_DOCS,
   SPLIT_BASE_FIELDS,
-  str,
 } from "#utils/block-schema/split-shared.js";
 
 export const type = "split-image";
+
+export const columnSafe = false;
 export const template = "design-system/split.html";
 
 export const fields = {
   ...SPLIT_BASE_FIELDS,
   figure_src: {
-    type: "image",
-    label: "Figure Image",
+    ...img("Figure Image"),
     required: true,
     description: "Image path.",
   },

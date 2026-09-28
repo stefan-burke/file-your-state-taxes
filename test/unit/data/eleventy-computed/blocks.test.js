@@ -84,6 +84,7 @@ describe("eleventyComputed.blocks", () => {
       type: "split-image",
       content: "## Section Heading",
       figure_src: "/images/example.jpg",
+      reverse: false,
       reveal_figure: "scale",
       reveal_content: "left",
       dark: false,
@@ -144,6 +145,39 @@ describe("eleventyComputed.blocks", () => {
       reveal: true,
       dark: false,
     });
+  });
+
+  test("fills nested button defaults per block, keeping authored values", async () => {
+    const cta = await runSingle({
+      type: "cta",
+      content: "## Go",
+      button: { text: "Go", href: "/go/" },
+    });
+    expect(cta.button).toEqual({
+      text: "Go",
+      href: "/go/",
+      variant: "secondary",
+      size: "lg",
+    });
+
+    const hero = await runSingle({
+      type: "hero",
+      content: "# Hi",
+      buttons: [
+        { text: "A", href: "/a/" },
+        { text: "B", href: "/b/", variant: "ghost" },
+      ],
+    });
+    expect(hero.buttons.map(({ variant }) => variant)).toEqual([
+      "primary",
+      "ghost",
+    ]);
+  });
+
+  test("leaves split-full without the split-figure reveal fields", async () => {
+    const block = await runSingle({ type: "split-full", left_content: "L" });
+    expect(block).not.toHaveProperty("reveal_content");
+    expect(block).not.toHaveProperty("reveal_figure");
   });
 
   test("allows user values to override default values", async () => {

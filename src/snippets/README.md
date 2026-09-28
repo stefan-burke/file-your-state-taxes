@@ -41,7 +41,6 @@ blocks:
 ```
 
 The `snippet` block renders the referenced snippet's blocks, not its Markdown
-body. Create the referenced file before using it and inspect the consuming
-page; missing snippet references currently render no blocks rather than
-failing the build. For accepted fields, use the generated
+body. A reference to a missing snippet fails the build, and snippet blocks are
+validated and default-filled exactly like page blocks. For accepted fields, use the generated
 [block reference](../../skills/cfa-static-site-builder/references/blocks.md).

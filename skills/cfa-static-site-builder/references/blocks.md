@@ -8,9 +8,9 @@ See [Layouts](layouts.md) for rendering architecture, column matching, sidebar b
 
 ## Reading the schemas
 
-Schema types retain authoring semantics: `markdown`, `image`, and `reference` store strings; `array<T>` is a list of T. Dotted paths describe nested objects, and `[]` describes each list item. A required child is required only when its optional parent object is supplied (or for each supplied list object). Required fields must be supplied even when a documented default is shown.
+Schema types retain authoring semantics: `markdown`, `image`, and `reference` store strings; `array<T>` is a list of T. Dotted paths describe nested objects, and `[]` describes each list item. A required child is required only when its optional parent object is supplied (or for each supplied list object). Required fields must be supplied even when a default is shown.
 
-The **Documented default** column reproduces display-text metadata, not executable typed defaults. It neither inserts values into YAML nor changes validation. `Not documented` means no default metadata exists. Copy the canonical examples, not default text, for executable YAML. Descriptions and usage notes may describe contextual/template behavior beyond schema validation.
+The **Default** column shows the value the build fills in when a block omits the field, after validation and before rendering, so templates and authors can rely on it. Defaults of nested fields apply within each supplied parent object. `Derived` defaults depend on another field, as the description explains; `None` means an omitted field stays absent. Descriptions and usage notes may describe contextual/template behavior beyond schema validation.
 
 **CMS collection availability** describes the schema's editor allowlist, not a runtime restriction. Site CMS customization can hide collections or blocks. Contextual blocks may still need page data to render usefully. **CMS label** identifies editor-exposed fields; `Not exposed` fields can still be authored in YAML.
 
@@ -18,10 +18,10 @@ The **Documented default** column reproduces display-text metadata, not executab
 
 `type` is a required string selecting a registered block. The common wrapper fields below come from `CONTAINER_FIELDS`. `dark` selects a dark section palette; `compact` reduces section padding. They affect full-width section wrappers, not direct column/sidebar rendering; transparent `snippet` blocks do not acquire their own wrapper.
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `dark` | `boolean` | optional | Not documented | Dark |  |
-| `compact` | `boolean` | optional | Not documented | Compact |  |
+| `dark` | `boolean` | optional | `false` | Dark |  |
+| `compact` | `boolean` | optional | None | Compact |  |
 
 ## Column and sidebar compatibility
 
@@ -86,11 +86,11 @@ Standalone section header with rich text intro.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `intro` | `markdown` | **required** | Not documented | Section Header Intro | Rich text content rendered as markdown. Use headings and body text together. |
+| `intro` | `markdown` | **required** | None | Section Header Intro | Rich text content rendered as markdown. Use headings and body text together. |
 | `align` | `string` | optional | `"center"` | Not exposed | Text alignment. \`"center"\` adds \`.text-center\`. |
-| `class` | `string` | optional | Not documented | Not exposed | Extra CSS classes. |
+| `class` | `string` | optional | None | Not exposed | Extra CSS classes. |
 
 ### Canonical example
 
@@ -125,16 +125,16 @@ Grid of feature cards with optional icons, names, and descriptions.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `items` | `array<object>` | **required** | Not documented | Features | Feature objects. Each: \`{icon, icon\_label, name, description, style}\`. Icon can be an Iconify ID (\`"prefix:name"\`), image path (\`"/images/foo.svg"\`), or raw HTML/emoji. |
-| `items[].icon` | `string` | optional | Not documented | Icon (Iconify ID or HTML entity) |  |
-| `items[].icon_label` | `string` | optional | Not documented | Icon Accessible Label |  |
-| `items[].name` | `string` | **required** | Not documented | Name |  |
-| `items[].description` | `markdown` | optional | Not documented | Description |  |
-| `items[].style` | `string` | optional | Not documented | Custom Style |  |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
-| `reveal` | `boolean` | optional | `true` | Not exposed | Adds \`data-reveal\` to each item. |
+| `items` | `array<object>` | **required** | None | Features | Feature objects. Each: \`{icon, icon\_label, name, description, style}\`. Icon can be an Iconify ID (\`"prefix:name"\`), image path (\`"/images/foo.svg"\`), or raw HTML/emoji. |
+| `items[].icon` | `string` | optional | None | Icon (Iconify ID or HTML entity) |  |
+| `items[].icon_label` | `string` | optional | None | Icon Accessible Label |  |
+| `items[].name` | `string` | **required** | None | Name |  |
+| `items[].description` | `markdown` | optional | None | Description |  |
+| `items[].style` | `string` | optional | None | Custom Style |  |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `reveal` | `boolean` | optional | `true` | Not exposed | Adds \`data-reveal\` to each feature. |
 | `center` | `boolean` | optional | `false` | Centered | If true, centers feature text. |
 
 ### Canonical example
@@ -175,16 +175,16 @@ Grid of cards featuring images with names and optional descriptions.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `items` | `array<object>` | **required** | Not documented | Cards | Card objects. Each: \`{image, name, description, link}\`. Images processed by \`{% image %}\` shortcode for responsive srcset + LQIP. |
-| `items[].image` | `image` | **required** | Not documented | Image |  |
-| `items[].name` | `string` | **required** | Not documented | Name |  |
-| `items[].description` | `string` | optional | Not documented | Description |  |
-| `items[].link` | `string` | optional | Not documented | Link URL |  |
-| `reveal` | `boolean` | optional | `true` | Not exposed | Adds \`data-reveal\` to each item. |
-| `image_aspect_ratio` | `string` | optional | Not documented | Image Aspect Ratio | Aspect ratio for images, e.g. \`"16/9"\`, \`"1/1"\`, \`"4/3"\`. |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `items` | `array<object>` | **required** | None | Cards | Card objects. Each: \`{image, name, description, link}\`. Images processed by \`{% image %}\` shortcode for responsive srcset + LQIP. |
+| `items[].image` | `image` | **required** | None | Image |  |
+| `items[].name` | `string` | **required** | None | Name |  |
+| `items[].description` | `string` | optional | None | Description |  |
+| `items[].link` | `string` | optional | None | Link URL |  |
+| `reveal` | `boolean` | optional | `true` | Not exposed | Adds \`data-reveal\` to each card. |
+| `image_aspect_ratio` | `string` | optional | None | Image Aspect Ratio | Aspect ratio for images, e.g. \`"16/9"\`, \`"1/1"\`, \`"4/3"\`. |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
 
 ### Canonical example
 
@@ -224,12 +224,12 @@ Key metrics displayed as large numbers with labels.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `items` | `array<object>` | **required** | Not documented | Statistics | Stat objects: \`{value, label}\` or pipe-delimited strings \`"value\|label"\`. Also accepts "value\|label" strings. |
-| `items[].value` | `string` | **required** | Not documented | Value |  |
-| `items[].label` | `string` | **required** | Not documented | Label |  |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `items` | `array<object>` | **required** | None | Statistics | Stat objects: \`{value, label}\` or pipe-delimited strings \`"value\|label"\`. Also accepts "value\|label" strings. |
+| `items[].value` | `string` | **required** | None | Value |  |
+| `items[].label` | `string` | **required** | None | Label |  |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
 | `reveal` | `boolean` | optional | `true` | Not exposed | Adds \`data-reveal\` to each stat. |
 
 ### Canonical example
@@ -266,13 +266,13 @@ Terminal-style code display with macOS-like toolbar header.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
-| `filename` | `string` | **required** | Not documented | Filename | Displayed in the toolbar header. |
-| `code` | `string` | **required** | Not documented | Code | Code content. Rendered in \`\<pre>\<code>\`. |
-| `language` | `string` | optional | Not documented | Language | Sets \`data-language\` attribute (for future syntax highlighting). |
-| `reveal` | `boolean` | optional | `true` | Not exposed | \`data-reveal\` value. |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `filename` | `string` | **required** | None | Filename | Displayed in the toolbar header. |
+| `code` | `string` | **required** | None | Code | Code content. Rendered in \`\<pre>\<code>\`. |
+| `language` | `string` | optional | None | Language | Sets \`data-language\` attribute (for future syntax highlighting). |
+| `reveal` | `boolean` | optional | `true` | Not exposed | Adds \`data-reveal\` to the code block. |
 
 ### Canonical example
 
@@ -307,17 +307,17 @@ Full-width hero banner with optional badge, markdown content, and action buttons
 
 **Columns / sidebar:** No
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `badge` | `string` | optional | Not documented | Badge Text | Small pill label above the content. Renders as \`\<span class="badge">\`. |
-| `content` | `markdown` | **required** | Not documented | Content | Markdown content rendered in \`.prose\`. Start with a \`# Heading\`; paragraphs get \`body-lg\` size and muted color in a centered, guttered measure. |
-| `buttons` | `array<object>` | optional | Not documented | Buttons | Action buttons below the content. Each: \`{text, href, variant, size}\`. Variants: \`"primary"\` (filled), \`"secondary"\` (outlined), \`"ghost"\` (transparent). Sizes: \`"sm"\`, \`"lg"\`, or omit for default. |
-| `buttons[].text` | `string` | **required** | Not documented | Button Text |  |
-| `buttons[].href` | `string` | **required** | Not documented | URL |  |
-| `buttons[].variant` | `string` | optional | Not documented | Variant |  |
-| `buttons[].size` | `string` | optional | Not documented | Size |  |
-| `reveal` | `string` | optional | Not documented | Not exposed | \`data-reveal\` value. |
-| `class` | `string` | optional | Not documented | CSS Class | Extra CSS classes on the \`\<header>\`. Use \`"gradient"\` for gradient bg. |
+| `badge` | `string` | optional | None | Badge Text | Small pill label above the content. Renders as \`\<span class="badge">\`. |
+| `content` | `markdown` | **required** | None | Content | Markdown content rendered in \`.prose\`. Start with a \`# Heading\`; paragraphs get \`body-lg\` size and muted color in a centered, guttered measure. |
+| `buttons` | `array<object>` | optional | None | Buttons | Action buttons below the content. Each: \`{text, href, variant, size}\`. Variants: \`"primary"\` (filled), \`"secondary"\` (outlined), \`"ghost"\` (transparent). Sizes: \`"sm"\`, \`"lg"\`, or omit for default. |
+| `buttons[].text` | `string` | **required** | None | Button Text |  |
+| `buttons[].href` | `string` | **required** | None | URL |  |
+| `buttons[].variant` | `string` | optional | `"primary"` | Variant |  |
+| `buttons[].size` | `string` | optional | None | Size |  |
+| `reveal` | `string` | optional | None | Not exposed | \`data-reveal\` value. |
+| `class` | `string` | optional | None | CSS Class | Extra CSS classes on the \`\<header>\`. Use \`"gradient"\` for gradient bg. |
 
 ### Canonical example
 
@@ -362,21 +362,21 @@ Two-column layout with text content and a responsive image.
 
 **Columns / sidebar:** No
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `subtitle` | `string` | optional | Not documented | Subtitle | Subtitle with \`.text-muted\` styling. |
-| `content` | `markdown` | optional | Not documented | Content | Main content with markdown headings (e.g. \`## Heading\`). Rendered through \`renderContent: "md"\` filter, wrapped in \`.prose\`. |
+| `subtitle` | `string` | optional | None | Subtitle | Subtitle with \`.text-muted\` styling. |
+| `content` | `markdown` | optional | None | Content | Main content with markdown headings (e.g. \`## Heading\`). Rendered through \`renderContent: "md"\` filter, wrapped in \`.prose\`. |
 | `reverse` | `boolean` | optional | `false` | Reverse Layout | Reverses column order (content right, figure left) on desktop. |
-| `reveal_content` | `string` | optional | `"left"` | Reveal Content Animation | \`data-reveal\` for the text side. Auto-set to \`"right"\` when \`reverse\` is true. |
+| `reveal_content` | `string` | optional | Derived | Reveal Content Animation | \`data-reveal\` for the text side. Defaults to \`"left"\`, or \`"right"\` when \`reverse\` is true. |
 | `reveal_figure` | `string` | optional | `"scale"` | Reveal Figure Animation | \`data-reveal\` for the figure side. |
-| `button` | `object` | optional | Not documented | Button | \`{text, href, variant}\`. Rendered below content. Default variant: \`"secondary"\`. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `figure_src` | `image` | **required** | Not documented | Figure Image | Image path. |
-| `figure_alt` | `string` | optional | Not documented | Figure Alt Text | Alt text for the image. |
-| `figure_caption` | `string` | optional | Not documented | Figure Caption | Visible caption below the image. |
+| `button` | `object` | optional | None | Button | \`{text, href, variant, size}\`. Rendered below content. |
+| `button.text` | `string` | **required** | None | Button Text |  |
+| `button.href` | `string` | **required** | None | URL |  |
+| `button.variant` | `string` | optional | `"secondary"` | Variant |  |
+| `button.size` | `string` | optional | None | Size |  |
+| `figure_src` | `image` | **required** | None | Figure Image | Image path. |
+| `figure_alt` | `string` | optional | None | Figure Alt Text | Alt text for the image. |
+| `figure_caption` | `string` | optional | None | Figure Caption | Visible caption below the image. |
 
 ### Canonical example
 
@@ -415,21 +415,21 @@ Two-column layout with text content and a code block.
 
 **Columns / sidebar:** No
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `subtitle` | `string` | optional | Not documented | Subtitle | Subtitle with \`.text-muted\` styling. |
-| `content` | `markdown` | optional | Not documented | Content | Main content with markdown headings (e.g. \`## Heading\`). Rendered through \`renderContent: "md"\` filter, wrapped in \`.prose\`. |
+| `subtitle` | `string` | optional | None | Subtitle | Subtitle with \`.text-muted\` styling. |
+| `content` | `markdown` | optional | None | Content | Main content with markdown headings (e.g. \`## Heading\`). Rendered through \`renderContent: "md"\` filter, wrapped in \`.prose\`. |
 | `reverse` | `boolean` | optional | `false` | Reverse Layout | Reverses column order (content right, figure left) on desktop. |
-| `reveal_content` | `string` | optional | `"left"` | Reveal Content Animation | \`data-reveal\` for the text side. Auto-set to \`"right"\` when \`reverse\` is true. |
+| `reveal_content` | `string` | optional | Derived | Reveal Content Animation | \`data-reveal\` for the text side. Defaults to \`"left"\`, or \`"right"\` when \`reverse\` is true. |
 | `reveal_figure` | `string` | optional | `"scale"` | Reveal Figure Animation | \`data-reveal\` for the figure side. |
-| `button` | `object` | optional | Not documented | Button | \`{text, href, variant}\`. Rendered below content. Default variant: \`"secondary"\`. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `figure_filename` | `string` | optional | Not documented | Code Filename | Displayed filename in the code block header. |
-| `figure_code` | `string` | **required** | Not documented | Code Content | Code content. |
-| `figure_language` | `string` | optional | Not documented | Code Language | Syntax highlighting language. |
+| `button` | `object` | optional | None | Button | \`{text, href, variant, size}\`. Rendered below content. |
+| `button.text` | `string` | **required** | None | Button Text |  |
+| `button.href` | `string` | **required** | None | URL |  |
+| `button.variant` | `string` | optional | `"secondary"` | Variant |  |
+| `button.size` | `string` | optional | None | Size |  |
+| `figure_filename` | `string` | optional | None | Code Filename | Displayed filename in the code block header. |
+| `figure_code` | `string` | **required** | None | Code Content | Code content. |
+| `figure_language` | `string` | optional | None | Code Language | Syntax highlighting language. |
 
 ### Canonical example
 
@@ -472,22 +472,22 @@ Two-column layout with text content and an icon-links list.
 
 **Columns / sidebar:** No
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `subtitle` | `string` | optional | Not documented | Subtitle | Subtitle with \`.text-muted\` styling. |
-| `content` | `markdown` | optional | Not documented | Content | Main content with markdown headings (e.g. \`## Heading\`). Rendered through \`renderContent: "md"\` filter, wrapped in \`.prose\`. |
+| `subtitle` | `string` | optional | None | Subtitle | Subtitle with \`.text-muted\` styling. |
+| `content` | `markdown` | optional | None | Content | Main content with markdown headings (e.g. \`## Heading\`). Rendered through \`renderContent: "md"\` filter, wrapped in \`.prose\`. |
 | `reverse` | `boolean` | optional | `false` | Reverse Layout | Reverses column order (content right, figure left) on desktop. |
-| `reveal_content` | `string` | optional | `"left"` | Reveal Content Animation | \`data-reveal\` for the text side. Auto-set to \`"right"\` when \`reverse\` is true. |
+| `reveal_content` | `string` | optional | Derived | Reveal Content Animation | \`data-reveal\` for the text side. Defaults to \`"left"\`, or \`"right"\` when \`reverse\` is true. |
 | `reveal_figure` | `string` | optional | `"scale"` | Reveal Figure Animation | \`data-reveal\` for the figure side. |
-| `button` | `object` | optional | Not documented | Button | \`{text, href, variant}\`. Rendered below content. Default variant: \`"secondary"\`. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `figure_items` | `array<object>` | **required** | Not documented | Links | Icon-link objects. Each: \`{icon, text, url}\`. \`url\` is optional. Icon can be an Iconify ID (\`"prefix:name"\`), image path, or raw HTML/emoji. |
-| `figure_items[].icon` | `string` | **required** | Not documented | Icon (Iconify ID or HTML entity) |  |
-| `figure_items[].text` | `string` | **required** | Not documented | Link Text |  |
-| `figure_items[].url` | `string` | optional | Not documented | URL |  |
+| `button` | `object` | optional | None | Button | \`{text, href, variant, size}\`. Rendered below content. |
+| `button.text` | `string` | **required** | None | Button Text |  |
+| `button.href` | `string` | **required** | None | URL |  |
+| `button.variant` | `string` | optional | `"secondary"` | Variant |  |
+| `button.size` | `string` | optional | None | Size |  |
+| `figure_items` | `array<object>` | **required** | None | Links | Icon-link objects. Each: \`{icon, text, url}\`. \`url\` is optional. Icon can be an Iconify ID (\`"prefix:name"\`), image path, or raw HTML/emoji. |
+| `figure_items[].icon` | `string` | **required** | None | Icon (Iconify ID or HTML entity) |  |
+| `figure_items[].text` | `string` | **required** | None | Link Text |  |
+| `figure_items[].url` | `string` | optional | None | URL |  |
 
 ### Canonical example
 
@@ -531,19 +531,19 @@ Two-column layout with text content and custom HTML.
 
 **Columns / sidebar:** No
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `subtitle` | `string` | optional | Not documented | Subtitle | Subtitle with \`.text-muted\` styling. |
-| `content` | `markdown` | optional | Not documented | Content | Main content with markdown headings (e.g. \`## Heading\`). Rendered through \`renderContent: "md"\` filter, wrapped in \`.prose\`. |
+| `subtitle` | `string` | optional | None | Subtitle | Subtitle with \`.text-muted\` styling. |
+| `content` | `markdown` | optional | None | Content | Main content with markdown headings (e.g. \`## Heading\`). Rendered through \`renderContent: "md"\` filter, wrapped in \`.prose\`. |
 | `reverse` | `boolean` | optional | `false` | Reverse Layout | Reverses column order (content right, figure left) on desktop. |
-| `reveal_content` | `string` | optional | `"left"` | Reveal Content Animation | \`data-reveal\` for the text side. Auto-set to \`"right"\` when \`reverse\` is true. |
+| `reveal_content` | `string` | optional | Derived | Reveal Content Animation | \`data-reveal\` for the text side. Defaults to \`"left"\`, or \`"right"\` when \`reverse\` is true. |
 | `reveal_figure` | `string` | optional | `"scale"` | Reveal Figure Animation | \`data-reveal\` for the figure side. |
-| `button` | `object` | optional | Not documented | Button | \`{text, href, variant}\`. Rendered below content. Default variant: \`"secondary"\`. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `figure_html` | `markdown` | **required** | Not documented | Figure HTML Content | Raw HTML content for the figure side. |
+| `button` | `object` | optional | None | Button | \`{text, href, variant, size}\`. Rendered below content. |
+| `button.text` | `string` | **required** | None | Button Text |  |
+| `button.href` | `string` | **required** | None | URL |  |
+| `button.variant` | `string` | optional | `"secondary"` | Variant |  |
+| `button.size` | `string` | optional | None | Size |  |
+| `figure_html` | `markdown` | **required** | None | Figure HTML Content | Raw HTML content for the figure side. |
 
 ### Canonical example
 
@@ -578,21 +578,21 @@ Two-column layout with text content and a styled callout box with icon, name, an
 
 **Columns / sidebar:** No
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `subtitle` | `string` | optional | Not documented | Subtitle | Subtitle with \`.text-muted\` styling. |
-| `content` | `markdown` | optional | Not documented | Content | Main content with markdown headings (e.g. \`## Heading\`). Rendered through \`renderContent: "md"\` filter, wrapped in \`.prose\`. |
+| `subtitle` | `string` | optional | None | Subtitle | Subtitle with \`.text-muted\` styling. |
+| `content` | `markdown` | optional | None | Content | Main content with markdown headings (e.g. \`## Heading\`). Rendered through \`renderContent: "md"\` filter, wrapped in \`.prose\`. |
 | `reverse` | `boolean` | optional | `false` | Reverse Layout | Reverses column order (content right, figure left) on desktop. |
-| `reveal_content` | `string` | optional | `"left"` | Reveal Content Animation | \`data-reveal\` for the text side. Auto-set to \`"right"\` when \`reverse\` is true. |
+| `reveal_content` | `string` | optional | Derived | Reveal Content Animation | \`data-reveal\` for the text side. Defaults to \`"left"\`, or \`"right"\` when \`reverse\` is true. |
 | `reveal_figure` | `string` | optional | `"scale"` | Reveal Figure Animation | \`data-reveal\` for the figure side. |
-| `button` | `object` | optional | Not documented | Button | \`{text, href, variant}\`. Rendered below content. Default variant: \`"secondary"\`. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `figure_icon` | `string` | optional | Not documented | Icon (Iconify ID, emoji, or path) | Icon content: Iconify ID (\`prefix:name\`), emoji, or image path. |
-| `figure_name` | `string` | **required** | Not documented | Callout Name | Bold heading text in the callout box. |
-| `figure_subtitle` | `string` | optional | Not documented | Callout Subtitle | Supporting text below the name. |
+| `button` | `object` | optional | None | Button | \`{text, href, variant, size}\`. Rendered below content. |
+| `button.text` | `string` | **required** | None | Button Text |  |
+| `button.href` | `string` | **required** | None | URL |  |
+| `button.variant` | `string` | optional | `"secondary"` | Variant |  |
+| `button.size` | `string` | optional | None | Size |  |
+| `figure_icon` | `string` | optional | None | Icon (Iconify ID, emoji, or path) | Icon content: Iconify ID (\`prefix:name\`), emoji, or image path. |
+| `figure_name` | `string` | **required** | None | Callout Name | Bold heading text in the callout box. |
+| `figure_subtitle` | `string` | optional | None | Callout Subtitle | Supporting text below the name. |
 | `figure_variant` | `string` | optional | `"primary"` | Callout Color Variant | Color scheme: \`"primary"\`, \`"secondary"\`, \`"gradient"\`, or a custom CSS gradient string. |
 
 ### Canonical example
@@ -630,21 +630,23 @@ Full-width two-panel layout with distinct background colors per side.
 
 **Columns / sidebar:** No
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `variant` | `string` | optional | Not documented | Variant | Color scheme: \`"dark-left"\`, \`"dark-right"\`, \`"primary-left"\`, \`"primary-right"\`. |
-| `left_content` | `markdown` | optional | Not documented | Left Content | Left panel content with markdown headings (e.g. \`## Heading\`). Rendered as markdown via \`.prose\`. |
-| `left_button` | `object` | optional | Not documented | Left Button | \`{text, href, variant}\`. |
-| `left_button.text` | `string` | **required** | Not documented | Button Text |  |
-| `left_button.href` | `string` | **required** | Not documented | URL |  |
-| `left_button.variant` | `string` | optional | Not documented | Variant |  |
-| `right_content` | `markdown` | optional | Not documented | Right Content | Right panel content with markdown headings (e.g. \`## Heading\`). Rendered as markdown via \`.prose\`. |
-| `right_button` | `object` | optional | Not documented | Right Button | \`{text, href, variant}\`. |
-| `right_button.text` | `string` | **required** | Not documented | Button Text |  |
-| `right_button.href` | `string` | **required** | Not documented | URL |  |
-| `right_button.variant` | `string` | optional | Not documented | Variant |  |
-| `reveal_left` | `string` | optional | Not documented | Reveal Left Animation | \`data-reveal\` for left panel. |
-| `reveal_right` | `string` | optional | Not documented | Reveal Right Animation | \`data-reveal\` for right panel. |
+| `variant` | `string` | optional | None | Variant | Color scheme: \`"dark-left"\`, \`"dark-right"\`, \`"primary-left"\`, \`"primary-right"\`. |
+| `left_content` | `markdown` | optional | None | Left Content | Left panel content with markdown headings (e.g. \`## Heading\`). Rendered as markdown via \`.prose\`. |
+| `left_button` | `object` | optional | None | Left Button | \`{text, href, variant, size}\`. |
+| `left_button.text` | `string` | **required** | None | Button Text |  |
+| `left_button.href` | `string` | **required** | None | URL |  |
+| `left_button.variant` | `string` | optional | `"secondary"` | Variant |  |
+| `left_button.size` | `string` | optional | None | Size |  |
+| `right_content` | `markdown` | optional | None | Right Content | Right panel content with markdown headings (e.g. \`## Heading\`). Rendered as markdown via \`.prose\`. |
+| `right_button` | `object` | optional | None | Right Button | \`{text, href, variant, size}\`. |
+| `right_button.text` | `string` | **required** | None | Button Text |  |
+| `right_button.href` | `string` | **required** | None | URL |  |
+| `right_button.variant` | `string` | optional | `"secondary"` | Variant |  |
+| `right_button.size` | `string` | optional | None | Size |  |
+| `reveal_left` | `string` | optional | None | Reveal Left Animation | \`data-reveal\` for left panel. |
+| `reveal_right` | `string` | optional | None | Reveal Right Animation | \`data-reveal\` for right panel. |
 
 **Usage notes:** Variants: \`"dark-left"\` / \`"dark-right"\` (dark bg + light text), \`"primary-left"\` / \`"primary-right"\` (\`--color-link\` bg + contrast text). Button colors automatically invert in dark/primary panels. The parent \`\<section>\` has zero padding — panels handle their own padding.
 
@@ -691,15 +693,15 @@ Call-to-action banner with gradient background.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `content` | `markdown` | **required** | Not documented | Content | Markdown content with optional heading (e.g. \`## Heading\`). \`body-lg\`, 0.9 opacity, max-width \`$width-narrow\`. |
-| `button` | `object` | optional | Not documented | Button | \`{text, href, variant, size}\`. Default variant: \`"secondary"\`, default size: \`"lg"\`. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `reveal` | `string` | optional | Not documented | Not exposed | \`data-reveal\` value. |
+| `content` | `markdown` | **required** | None | Content | Markdown content with optional heading (e.g. \`## Heading\`). \`body-lg\`, 0.9 opacity, max-width \`$width-narrow\`. |
+| `button` | `object` | optional | None | Button | \`{text, href, variant, size}\`. |
+| `button.text` | `string` | **required** | None | Button Text |  |
+| `button.href` | `string` | **required** | None | URL |  |
+| `button.variant` | `string` | optional | `"secondary"` | Variant |  |
+| `button.size` | `string` | optional | `"lg"` | Size |  |
+| `reveal` | `string` | optional | None | Not exposed | \`data-reveal\` value. |
 
 ### Canonical example
 
@@ -736,12 +738,12 @@ One-column callout/note with icon, name, and short content — for content warni
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
 | `variant` | `string` | optional | `"info"` | Variant (info \| warning \| success \| danger) | Color scheme: \`"info"\`, \`"warning"\`, \`"success"\`, or \`"danger"\`. |
-| `icon` | `string` | optional | Not documented | Icon (Iconify ID, emoji, or path) | Icon content: Iconify ID (\`prefix:name\`), emoji, or image path. |
-| `name` | `string` | optional | Not documented | Name | Bold heading text. |
-| `content` | `markdown` | **required** | Not documented | Content | Markdown content rendered via \`renderContent: "md"\` inside \`.prose\`. |
+| `icon` | `string` | optional | None | Icon (Iconify ID, emoji, or path) | Icon content: Iconify ID (\`prefix:name\`), emoji, or image path. |
+| `name` | `string` | optional | None | Name | Bold heading text. |
+| `content` | `markdown` | **required** | None | Content | Markdown content rendered via \`renderContent: "md"\` inside \`.prose\`. |
 
 ### Canonical example
 
@@ -775,19 +777,19 @@ Full-width image background with hero-style overlay content (badge, markdown con
 
 **Columns / sidebar:** No
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `image` | `image` | **required** | Not documented | Background Image | Image path. |
+| `image` | `image` | **required** | None | Background Image | Image path. |
 | `image_alt` | `string` | optional | `"Background image"` | Image Alt Text | Alt text. |
-| `class` | `string` | optional | Not documented | CSS Class | Extra CSS classes. |
-| `badge` | `string` | optional | Not documented | Badge Text | Small pill label above the content. Renders as \`\<span class="badge">\`. |
-| `content` | `markdown` | optional | Not documented | Content | Markdown overlay content rendered in \`.prose\` inside the \`\<figcaption>\`. |
-| `buttons` | `array<object>` | optional | Not documented | Buttons | Action buttons below the content. Each: \`{text, href, variant, size}\`. Variants: \`"primary"\` (filled), \`"secondary"\` (outlined), \`"ghost"\` (transparent). Sizes: \`"sm"\`, \`"lg"\`, or omit for default. |
-| `buttons[].text` | `string` | **required** | Not documented | Button Text |  |
-| `buttons[].href` | `string` | **required** | Not documented | URL |  |
-| `buttons[].variant` | `string` | optional | Not documented | Variant |  |
-| `buttons[].size` | `string` | optional | Not documented | Size |  |
-| `reveal` | `string` | optional | Not documented | Not exposed | \`data-reveal\` value. |
+| `class` | `string` | optional | None | CSS Class | Extra CSS classes. |
+| `badge` | `string` | optional | None | Badge Text | Small pill label above the content. Renders as \`\<span class="badge">\`. |
+| `content` | `markdown` | optional | None | Content | Markdown overlay content rendered in \`.prose\` inside the \`\<figcaption>\`. |
+| `buttons` | `array<object>` | optional | None | Buttons | Action buttons below the content. Each: \`{text, href, variant, size}\`. Variants: \`"primary"\` (filled), \`"secondary"\` (outlined), \`"ghost"\` (transparent). Sizes: \`"sm"\`, \`"lg"\`, or omit for default. |
+| `buttons[].text` | `string` | **required** | None | Button Text |  |
+| `buttons[].href` | `string` | **required** | None | URL |  |
+| `buttons[].variant` | `string` | optional | `"primary"` | Variant |  |
+| `buttons[].size` | `string` | optional | None | Size |  |
+| `reveal` | `string` | optional | None | Not exposed | \`data-reveal\` value. |
 | `parallax` | `boolean` | optional | `false` | Parallax | Enables CSS \`animation-timeline: scroll()\` parallax effect. |
 | `tint` | `boolean` | optional | `false` | Tint | Applies a dark gradient overlay for text legibility over the background image. |
 
@@ -826,17 +828,17 @@ Displays an Eleventy collection as a card grid or horizontal slider.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `collection` | `string` | **required** | Not documented | Collection Name | Name of an Eleventy collection (e.g. \`"news"\`, \`"guideCategories"\`). |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `collection` | `string` | **required** | None | Collection Name | Name of an Eleventy collection (e.g. \`"news"\`, \`"guideCategories"\`). |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
 | `horizontal` | `boolean` | optional | `false` | Horizontal Slider | If true, renders as a horizontal slider instead of a wrapping grid. |
 | `masonry` | `boolean` | optional | `false` | Masonry Grid | If true, renders as a masonry grid using uWrap for zero-reflow height prediction. |
-| `filter` | `object` | optional | Not documented | Filter | Filter object: \`{property, includes, equals}\`. \`property\` is a dot-notation path (e.g. \`"url"\`, \`"data.name"\`). When the resolved value is an array, the operator runs against each element (per-element exact match for \`equals\`, per-element substring for \`includes\`). \`includes\` matches substring; \`equals\` matches exact value. |
-| `filter.property` | `string` | optional | Not documented | Property (e.g. url, data.name) |  |
-| `filter.includes` | `string` | optional | Not documented | Contains |  |
-| `filter.equals` | `string` | optional | Not documented | Equals |  |
-| `image_aspect_ratio` | `string` | optional | Not documented | Image Aspect Ratio | Aspect ratio for images, e.g. \`"16/9"\`, \`"1/1"\`, \`"4/3"\`. |
+| `filter` | `object` | optional | None | Filter | Filter object: \`{property, includes, equals}\`. \`property\` is a dot-notation path (e.g. \`"url"\`, \`"data.name"\`). When the resolved value is an array, the operator runs against each element (per-element exact match for \`equals\`, per-element substring for \`includes\`). \`includes\` matches substring; \`equals\` matches exact value. |
+| `filter.property` | `string` | optional | None | Property (e.g. url, data.name) |  |
+| `filter.includes` | `string` | optional | None | Contains |  |
+| `filter.equals` | `string` | optional | None | Equals |  |
+| `image_aspect_ratio` | `string` | optional | None | Image Aspect Ratio | Aspect ratio for images, e.g. \`"16/9"\`, \`"1/1"\`, \`"4/3"\`. |
 
 ### Canonical example
 
@@ -868,17 +870,17 @@ Renders items from an explicit list of paths. The collection is inferred dynamic
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `items` | `array<string>` | optional | Not documented | Items | Array of path strings. Each entry may be a file path (e.g. \`src/news/example.md\`) or a directory path (e.g. \`src/news\` or \`src/news/\`), in which case every item in that directory is included in place. |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `items` | `array<string>` | optional | None | Items | Array of path strings. Each entry may be a file path (e.g. \`src/news/example.md\`) or a directory path (e.g. \`src/news\` or \`src/news/\`), in which case every item in that directory is included in place. |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
 | `horizontal` | `boolean` | optional | `false` | Horizontal Slider | If true, renders as a horizontal slider instead of a wrapping grid. |
 | `masonry` | `boolean` | optional | `false` | Masonry Grid | If true, renders as a masonry grid using uWrap for zero-reflow height prediction. |
-| `filter` | `object` | optional | Not documented | Filter | Filter object: \`{property, includes, equals}\`. \`property\` is a dot-notation path (e.g. \`"url"\`, \`"data.name"\`). When the resolved value is an array, the operator runs against each element (per-element exact match for \`equals\`, per-element substring for \`includes\`). \`includes\` matches substring; \`equals\` matches exact value. |
-| `filter.property` | `string` | optional | Not documented | Property (e.g. url, data.name) |  |
-| `filter.includes` | `string` | optional | Not documented | Contains |  |
-| `filter.equals` | `string` | optional | Not documented | Equals |  |
-| `image_aspect_ratio` | `string` | optional | Not documented | Image Aspect Ratio | Aspect ratio for images, e.g. \`"16/9"\`, \`"1/1"\`, \`"4/3"\`. |
+| `filter` | `object` | optional | None | Filter | Filter object: \`{property, includes, equals}\`. \`property\` is a dot-notation path (e.g. \`"url"\`, \`"data.name"\`). When the resolved value is an array, the operator runs against each element (per-element exact match for \`equals\`, per-element substring for \`includes\`). \`includes\` matches substring; \`equals\` matches exact value. |
+| `filter.property` | `string` | optional | None | Property (e.g. url, data.name) |  |
+| `filter.includes` | `string` | optional | None | Contains |  |
+| `filter.equals` | `string` | optional | None | Equals |  |
+| `image_aspect_ratio` | `string` | optional | None | Image Aspect Ratio | Aspect ratio for images, e.g. \`"16/9"\`, \`"1/1"\`, \`"4/3"\`. |
 
 ### Canonical example
 
@@ -909,10 +911,10 @@ Renders a collection as a comma-separated inline list of links, with optional in
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `collection` | `string` | **required** | Not documented | Collection Name | Name of an Eleventy collection (e.g. \`"services"\`, \`"events"\`). |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `collection` | `string` | **required** | None | Collection Name | Name of an Eleventy collection (e.g. \`"services"\`, \`"events"\`). |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
 
 ### Canonical example
 
@@ -941,15 +943,15 @@ Renders a collection as a plain-text unordered list of links arranged in respons
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `collection` | `string` | **required** | Not documented | Collection Name | Name of an Eleventy collection (e.g. \`"locations"\`, \`"services"\`). |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
-| `filter` | `object` | optional | Not documented | Filter | Filter object: \`{property, includes, equals}\`. \`property\` is a dot-notation path (e.g. \`"url"\`, \`"data.name"\`). When the resolved value is an array, the operator runs against each element (per-element exact match for \`equals\`, per-element substring for \`includes\`). \`includes\` matches substring; \`equals\` matches exact value. |
-| `filter.property` | `string` | optional | Not documented | Property (e.g. url, data.name) |  |
-| `filter.includes` | `string` | optional | Not documented | Contains |  |
-| `filter.equals` | `string` | optional | Not documented | Equals |  |
-| `remove_text` | `string` | optional | Not documented | Remove Text (Regex) | Regex pattern (JavaScript syntax, global flag implied). Each match is removed from every link's display text and the result is trimmed. Useful for stripping repetitive prefixes like \`"Service in "\` so links render tidier. |
+| `collection` | `string` | **required** | None | Collection Name | Name of an Eleventy collection (e.g. \`"locations"\`, \`"services"\`). |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `filter` | `object` | optional | None | Filter | Filter object: \`{property, includes, equals}\`. \`property\` is a dot-notation path (e.g. \`"url"\`, \`"data.name"\`). When the resolved value is an array, the operator runs against each element (per-element exact match for \`equals\`, per-element substring for \`includes\`). \`includes\` matches substring; \`equals\` matches exact value. |
+| `filter.property` | `string` | optional | None | Property (e.g. url, data.name) |  |
+| `filter.includes` | `string` | optional | None | Contains |  |
+| `filter.equals` | `string` | optional | None | Equals |  |
+| `remove_text` | `string` | optional | None | Remove Text (Regex) | Regex pattern (JavaScript syntax, global flag implied). Each match is removed from every link's display text and the result is trimmed. Useful for stripping repetitive prefixes like \`"Service in "\` so links render tidier. |
 
 ### Canonical example
 
@@ -980,9 +982,9 @@ Renders markdown content as rich text.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `content` | `markdown` | **required** | Not documented | Markdown | Markdown content. Passed through \`renderContent: "md"\` filter. |
+| `content` | `markdown` | **required** | None | Markdown | Markdown content. Passed through \`renderContent: "md"\` filter. |
 
 ### Canonical example
 
@@ -1024,7 +1026,7 @@ In-page contents built from the headings the page actually renders.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
 | `title` | `string` | optional | `"On this page"` | Title | Heading above the list, and the accessible name of the navigation landmark. |
 | `levels` | `string` | optional | `"2,3"` | Heading Levels | Comma-separated heading levels to list, from \`2\` to \`6\`. Every other level is left out of the list, so \`"2"\` gives a top-level-only contents. An unlistable level fails the build. |
@@ -1056,9 +1058,9 @@ Outputs raw HTML without processing.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `content` | `string` | **required** | Not documented | Raw HTML | Raw HTML. Output directly with \`{{ block.content }}\`. |
+| `content` | `string` | **required** | None | Raw HTML | Raw HTML. Output directly with \`{{ block.content }}\`. |
 
 **Usage notes:** No wrapping element. Useful for custom embeds, iframes, or one-off HTML.
 
@@ -1091,18 +1093,18 @@ Third-party iframe embed (itch.io widgets, Buttondown, Bandcamp, Stripe buttons,
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `src` | `string` | **required** | Not documented | Iframe URL | Full URL of the iframe to embed. |
-| `name` | `string` | **required** | Not documented | Accessible Name | Accessible name (rendered as the iframe's \`title\` attribute). |
-| `width` | `number` | optional | Not documented | Width (px) | Fixed pixel width. Omit to fill the container. |
-| `height` | `number` | optional | Not documented | Height (px) | Fixed pixel height. Required for non-responsive embeds unless \`aspect\_ratio\` is set. |
-| `aspect_ratio` | `string` | optional | Not documented | Aspect Ratio (e.g. 16/9) | CSS \`aspect-ratio\` for responsive height, e.g. \`"16/9"\`. Alternative to \`height\`. |
-| `max_width` | `string` | optional | Not documented | Max Width (CSS, e.g. 560px) | CSS max-width on the wrapper, e.g. \`"560px"\`. |
-| `sandbox` | `string` | optional | Not documented | Sandbox | Space-separated sandbox tokens, e.g. \`"allow-scripts allow-same-origin allow-forms"\`. |
-| `allow` | `string` | optional | Not documented | Allow (permissions policy) | \`allow\` attribute for iframe permissions policy. |
-| `scrolling` | `string` | optional | Not documented | Scrolling | Legacy \`scrolling\` attribute, e.g. \`"no"\`. |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `src` | `string` | **required** | None | Iframe URL | Full URL of the iframe to embed. |
+| `name` | `string` | **required** | None | Accessible Name | Accessible name (rendered as the iframe's \`title\` attribute). |
+| `width` | `number` | optional | None | Width (px) | Fixed pixel width. Omit to fill the container. |
+| `height` | `number` | optional | None | Height (px) | Fixed pixel height. Required for non-responsive embeds unless \`aspect\_ratio\` is set. |
+| `aspect_ratio` | `string` | optional | None | Aspect Ratio (e.g. 16/9) | CSS \`aspect-ratio\` for responsive height, e.g. \`"16/9"\`. Alternative to \`height\`. |
+| `max_width` | `string` | optional | None | Max Width (CSS, e.g. 560px) | CSS max-width on the wrapper, e.g. \`"560px"\`. |
+| `sandbox` | `string` | optional | None | Sandbox | Space-separated sandbox tokens, e.g. \`"allow-scripts allow-same-origin allow-forms"\`. |
+| `allow` | `string` | optional | None | Allow (permissions policy) | \`allow\` attribute for iframe permissions policy. |
+| `scrolling` | `string` | optional | None | Scrolling | Legacy \`scrolling\` attribute, e.g. \`"no"\`. |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
 
 **Usage notes:** Provide either \`height\` for a fixed-height embed or \`aspect\_ratio\` (e.g. \`16/9\`) for a responsive one. Use \`max\_width\` to cap the embed width within the container.
 
@@ -1133,9 +1135,9 @@ Includes an arbitrary template file.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `file` | `string` | **required** | Not documented | Template File Path | Path to the template file to include. |
+| `file` | `string` | **required** | None | Template File Path | Path to the template file to include. |
 
 **Usage notes:** Escape hatch for custom content that doesn't fit the block system. The \`file\` value is passed straight to \`{% include %}\`.
 
@@ -1190,12 +1192,12 @@ Renders question/answer pairs as a definition list. Available on all page types.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `items` | `array<object>` | optional | Not documented | FAQs | FAQ question/answer pairs. Answers support markdown formatting. Falls back to page-level \`faqs\` array if omitted. |
-| `items[].question` | `string` | **required** | Not documented | Question |  |
-| `items[].answer` | `markdown` | optional | Not documented | Answer (Markdown) |  |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `items` | `array<object>` | optional | None | FAQs | FAQ question/answer pairs. Answers support markdown formatting. Falls back to page-level \`faqs\` array if omitted. |
+| `items[].question` | `string` | **required** | None | Question |  |
+| `items[].answer` | `markdown` | optional | None | Answer (Markdown) |  |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
 
 **Usage notes:** Define FAQs inline via \`items\`, or omit to fall back to the page-level \`faqs\` array (useful for pages and guide pages that declare FAQs in frontmatter). Answers are rendered as markdown.
 
@@ -1230,7 +1232,7 @@ Displays the site-wide guide categories.
 
 No block-specific fields. Common fields still apply.
 
-**Usage notes:** No block-level parameters. Uses the global \`collections.guide-categories\`, minus any category with a \`property\` — those belong to a single property's guide and are listed by the \`property-guides\` block on the property page instead.
+**Usage notes:** No block-level parameters. Uses the global \`collections.guide-categories\`, minus any category with a \`property\`, which belongs to a single property's guide.
 
 ### Canonical example
 
@@ -1340,13 +1342,13 @@ Standalone centered button linking to an anchor or URL.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `text` | `string` | **required** | Not documented | Button Text | Button label. |
-| `href` | `string` | **required** | Not documented | URL | Link URL or anchor (e.g. \`"#contact"\`, \`"/about"\`). |
+| `text` | `string` | **required** | None | Button Text | Button label. |
+| `href` | `string` | **required** | None | URL | Link URL or anchor (e.g. \`"#contact"\`, \`"/about"\`). |
 | `variant` | `string` | optional | `"primary"` | Variant | \`"primary"\`, \`"secondary"\`, or \`"ghost"\`. |
-| `size` | `string` | optional | Not documented | Size | \`"sm"\`, \`"lg"\`, or omit for default. |
-| `reveal` | `string` | optional | Not documented | Reveal Animation | \`data-reveal\` value. |
+| `size` | `string` | optional | None | Size | \`"sm"\`, \`"lg"\`, or omit for default. |
+| `reveal` | `string` | optional | None | Reveal Animation | \`data-reveal\` value. |
 
 ### Canonical example
 
@@ -1378,13 +1380,13 @@ Image grid with optional aspect ratio cropping and captions.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `items` | `array<object>` | **required** | Not documented | Gallery Images | Image objects. Each: \`{image, caption}\`. Images processed by \`{% image %}\` shortcode. |
-| `items[].image` | `image` | **required** | Not documented | Image |  |
-| `items[].caption` | `string` | optional | Not documented | Caption |  |
-| `aspect_ratio` | `string` | optional | Not documented | Aspect Ratio | Aspect ratio for images (e.g. \`"16/9"\`, \`"1/1"\`, \`"4/3"\`). Default: no cropping. |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `items` | `array<object>` | **required** | None | Gallery Images | Image objects. Each: \`{image, caption}\`. Images processed by \`{% image %}\` shortcode. |
+| `items[].image` | `image` | **required** | None | Image |  |
+| `items[].caption` | `string` | optional | None | Caption |  |
+| `aspect_ratio` | `string` | optional | None | Aspect Ratio | Aspect ratio for images (e.g. \`"16/9"\`, \`"1/1"\`, \`"4/3"\`). Default: no cropping. |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
 | `masonry` | `boolean` | optional | `false` | Masonry Grid | If true, renders as a masonry grid using uWrap for zero-reflow height prediction. |
 | `horizontal` | `boolean` | optional | `false` | Horizontal Slider | If true, renders as a horizontal slider instead of a wrapping grid. |
 
@@ -1426,15 +1428,15 @@ Continuously scrolling marquee of images (e.g. brand logos, partner badges).
 
 **Columns / sidebar:** No
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `items` | `array<object>` | **required** | Not documented | Images | Image objects. Each: \`{image, alt, link\_url}\`. \`image\` is a path; \`alt\` is optional alt text; \`link\_url\` is an optional URL to wrap the image in a link. Images are processed via the \`{% image %}\` shortcode for responsive formats and proper URL normalization. |
-| `items[].image` | `string` | **required** | Not documented | Image Path |  |
-| `items[].alt` | `string` | optional | Not documented | Alt Text |  |
-| `items[].link_url` | `string` | optional | Not documented | Link URL |  |
+| `items` | `array<object>` | **required** | None | Images | Image objects. Each: \`{image, alt, link\_url}\`. \`image\` is a path; \`alt\` is optional alt text; \`link\_url\` is an optional URL to wrap the image in a link. Images are processed via the \`{% image %}\` shortcode for responsive formats and proper URL normalization. |
+| `items[].image` | `string` | **required** | None | Image Path |  |
+| `items[].alt` | `string` | optional | None | Alt Text |  |
+| `items[].link_url` | `string` | optional | None | Link URL |  |
 | `speed` | `string` | optional | `"30s"` | Scroll Speed (e.g. 30s) | CSS animation duration for one full scroll cycle (e.g. \`"20s"\`, \`"45s"\`). Slower = longer duration. |
 | `height` | `string` | optional | `"50px"` | Image Height (e.g. 50px) | CSS height for the images (e.g. \`"60px"\`, \`"80px"\`). Width scales proportionally. |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
 
 ### Canonical example
 
@@ -1473,13 +1475,13 @@ Vertical list of links with icons, rendered as a flex column stack.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
-| `items` | `array<object>` | **required** | Not documented | Links | Link objects. Each: \`{icon, text, url}\`. \`url\` is optional — items without it render as plain text. Icon can be an Iconify ID (\`"prefix:name"\`), image path, or raw HTML/emoji. |
-| `items[].icon` | `string` | **required** | Not documented | Icon (Iconify ID or HTML entity) |  |
-| `items[].text` | `string` | **required** | Not documented | Link Text |  |
-| `items[].url` | `string` | optional | Not documented | URL |  |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `items` | `array<object>` | **required** | None | Links | Link objects. Each: \`{icon, text, url}\`. \`url\` is optional — items without it render as plain text. Icon can be an Iconify ID (\`"prefix:name"\`), image path, or raw HTML/emoji. |
+| `items[].icon` | `string` | **required** | None | Icon (Iconify ID or HTML entity) |  |
+| `items[].text` | `string` | **required** | None | Link Text |  |
+| `items[].url` | `string` | optional | None | URL |  |
 | `reveal` | `boolean` | optional | `true` | Not exposed | Adds \`data-reveal\` to each link item. |
 
 ### Canonical example
@@ -1520,12 +1522,12 @@ List of downloadable files. Each item auto-detects its icon from the file extens
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
-| `items` | `array<object>` | **required** | Not documented | Downloads | Download objects. Each: \`{file, label}\`. \`file\` is a site-relative URL path; \`label\` is the visible text. |
-| `items[].file` | `string` | **required** | Not documented | File Path (e.g. /files/guide.pdf) |  |
-| `items[].label` | `string` | **required** | Not documented | Label |  |
+| `intro_content` | `markdown` | optional | None | Intro Content (Markdown) | Markdown content rendered above the block in \`.prose\`. |
+| `items` | `array<object>` | **required** | None | Downloads | Download objects. Each: \`{file, label}\`. \`file\` is a site-relative URL path; \`label\` is the visible text. |
+| `items[].file` | `string` | **required** | None | File Path (e.g. /files/guide.pdf) |  |
+| `items[].label` | `string` | **required** | None | Label |  |
 | `reveal` | `boolean` | optional | `true` | Not exposed | Adds \`data-reveal\` to each download item. |
 
 **Usage notes:** The \`file\` path is resolved against \`src/\` (e.g. \`/files/guide.pdf\` reads from \`src/files/guide.pdf\`). Missing files cause a build error. Ensure the containing directory is configured as a passthrough-copy target so the file is also served to the browser.
@@ -1557,9 +1559,9 @@ Renders blocks from a named snippet file, enabling reusable block compositions.
 
 **Columns / sidebar:** Yes
 
-| Field | Schema type | Presence | Documented default | CMS label | Description |
+| Field | Schema type | Presence | Default | CMS label | Description |
 | --- | --- | --- | --- | --- | --- |
-| `reference` | `reference` | **required** | Not documented | Snippet | Filename of the snippet (without \`.md\` extension) from \`src/snippets/\`. CMS options: {"collection":"snippets"} |
+| `reference` | `reference` | **required** | None | Snippet | Filename of the snippet (without \`.md\` extension) from \`src/snippets/\`. CMS options: {"collection":"snippets"} |
 
 **Usage notes:** The referenced snippet must exist in \`src/snippets/\` and have a \`blocks\` frontmatter array. The snippet block is transparent — it renders no wrapping section element, so each inner block renders its own section directly.
 

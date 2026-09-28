@@ -1,7 +1,10 @@
 /* jscpd:ignore-start -- block schema declaration data */
-import { SPLIT_BASE_FIELDS, str } from "#utils/block-schema/split-shared.js";
+import { str } from "#utils/block-schema/shared.js";
+import { SPLIT_BASE_FIELDS } from "#utils/block-schema/split-shared.js";
 
 export const type = "split-callout";
+
+export const columnSafe = false;
 
 export const fields = {
   ...SPLIT_BASE_FIELDS,
@@ -21,7 +24,7 @@ export const fields = {
   },
   figure_variant: {
     ...str("Callout Color Variant"),
-    default: '"primary"',
+    default: "primary",
     description:
       'Color scheme: `"primary"`, `"secondary"`, `"gradient"`, or a custom CSS gradient string.',
   },

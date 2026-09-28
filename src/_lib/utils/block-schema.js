@@ -9,13 +9,19 @@
  *   - `example` — canonical block YAML data for the gallery and skill reference
  *   - optionally `template` and `collections` — dispatch override and CMS allowlist
  *   - optionally `containerWidth` ("full" | "narrow"; defaults to "wide")
+ *   - optionally `columnSafe` (false for blocks that need the full width, so
+ *     block-columns layouts and the sidebar reject them; defaults to true)
  *
  * This file aggregates them into:
- *   - `BLOCK_SCHEMAS`    — field definitions per type, used for both
- *     allowed-key checks and runtime value-shape validation. Indexed by
- *     block type; each entry maps field name → `{ type, list?, ... }`.
+ *   - `BLOCK_SCHEMAS`    — field definitions per type, used for allowed-key
+ *     checks, runtime value-shape validation, and default filling. Indexed
+ *     by block type; each entry maps field name → `{ type, list?, ... }`.
  *   - `BLOCK_CMS_FIELDS` — CMS field definitions (for .pages.yml generation)
  *   - `BLOCK_DOCS`       — documentation for the generated skill block reference
+ *   - per-type lookups (`getBlockTemplate`, `getBlockContainerWidth`,
+ *     `isColumnSafeBlock`) that throw on unknown types
+ *   - `normaliseBlocks` / `applyBlockDefaults` — the single path every
+ *     authored block takes before rendering
  */
 
 import * as callout from "#utils/block-schema/callout.js";
@@ -114,55 +120,62 @@ const indexByType = (getValue) =>
 
 const BLOCK_SCHEMAS = indexByType((m) => m.fields);
 
-/** @type {Record<string, "full" | "wide" | "narrow">} */
-const BLOCK_CONTAINER_WIDTHS = indexByType((m) =>
+const VALID_TYPES_MESSAGE = `Valid types: ${Object.keys(BLOCK_SCHEMAS).join(", ")}`;
+
+/**
+ * Indexes one module property by type and returns its lookup. The lookup
+ * throws on unknown types, so a typo in a template or layout config fails
+ * loudly rather than resolving to `undefined`.
+ * @template T
+ * @param {(module: BlockModule) => T} getValue
+ * @returns {(blockType: string) => T}
+ */
+const lookupByType = (getValue) => {
+  const index = indexByType(getValue);
+  return (blockType) => {
+    if (!(blockType in index)) {
+      throw new Error(
+        `Unknown block type "${blockType}". ${VALID_TYPES_MESSAGE}`,
+      );
+    }
+    return index[blockType];
+  };
+};
+
+/** @type {(blockType: string) => "full" | "wide" | "narrow"} */
+const getBlockContainerWidth = lookupByType((m) =>
   "containerWidth" in m ? m.containerWidth : "wide",
 );
 
-/** @param {string} blockType */
-const getBlockContainerWidth = (blockType) =>
-  BLOCK_CONTAINER_WIDTHS[blockType] || "wide";
-
 /**
- * Per-block override of the dispatch path. The default is
- * `design-system/blocks/<type>.html`. A block module exports `template` only
- * when multiple types share one underlying template (e.g. every `split-*`
- * variant points at `design-system/split.html`).
- * @type {Record<string, string | undefined>}
+ * Include-relative template path for a block type, e.g.
+ * `"design-system/blocks/hero.html"`. A module exports `template` only when
+ * several types share one template (every figure `split-*` variant renders
+ * through `design-system/split.html`).
+ * @type {(blockType: string) => string}
  */
-const BLOCK_TEMPLATE_OVERRIDES = indexByType((m) =>
-  "template" in m ? m.template : undefined,
+const getBlockTemplate = lookupByType((m) =>
+  "template" in m ? m.template : `design-system/blocks/${m.type}.html`,
 );
 
 /**
- * Returns the include-relative template path for a block type. Default is
- * derived from `type`; schema modules can override by exporting a `template`
- * string (used by split-* variants that share one underlying template).
- * Throws on unknown types so dispatching fails loudly rather than silently
- * including a non-existent path.
- *
- * @param {string} blockType
- * @returns {string} e.g. `"design-system/blocks/hero.html"`
+ * Whether a block type may render inside a block-columns layout or the
+ * narrow right-content sidebar. Full-bleed and two-pane blocks opt out.
+ * @type {(blockType: string) => boolean}
  */
-const getBlockTemplate = (blockType) => {
-  if (!(blockType in BLOCK_SCHEMAS)) {
-    throw new Error(
-      `Unknown block type "${blockType}". Valid types: ${Object.keys(BLOCK_SCHEMAS).join(", ")}`,
-    );
-  }
-  const override = BLOCK_TEMPLATE_OVERRIDES[blockType];
-  if (override) return override;
-  return `design-system/blocks/${blockType}.html`;
-};
+const isColumnSafeBlock = lookupByType((m) =>
+  "columnSafe" in m ? m.columnSafe : true,
+);
 
 /**
  * Collection allowlist per block type. `null` means the block is available on
  * every collection; an array restricts it to the listed collections.
- * @type {Record<string, string[] | null>}
+ * @param {BlockModule} m
+ * @returns {string[] | null}
  */
-const BLOCK_ALLOWED_COLLECTIONS = indexByType((m) =>
-  "collections" in m ? m.collections : null,
-);
+const allowedCollections = (m) => ("collections" in m ? m.collections : null);
+
+const getAllowedCollections = lookupByType(allowedCollections);
 
 /**
  * Returns true when `blockType` is allowed on the given collection.
@@ -171,21 +184,31 @@ const BLOCK_ALLOWED_COLLECTIONS = indexByType((m) =>
  * @param {string} collectionName
  */
 const isBlockAllowedIn = (blockType, collectionName) => {
-  const allowed = BLOCK_ALLOWED_COLLECTIONS[blockType];
+  const allowed = getAllowedCollections(blockType);
   return allowed === null || allowed.includes(collectionName);
 };
 
-const BLOCK_CMS_FIELDS = indexByType((m) => ({
-  ...CONTAINER_FIELDS,
-  ...Object.fromEntries(
-    Object.entries(m.fields)
+/**
+ * CMS-exposed (labelled) fields with the doc-only `description` and the
+ * pipeline-applied `default` stripped, recursing into nested fields.
+ * @param {Record<string, any>} fields
+ * @returns {Record<string, any>}
+ */
+const toCmsFields = (fields) =>
+  Object.fromEntries(
+    Object.entries(fields)
       .filter(([, f]) => "label" in f)
       .map(([key, { description, default: _default, ...cmsProps }]) => [
         key,
-        cmsProps,
+        cmsProps.fields
+          ? { ...cmsProps, fields: toCmsFields(cmsProps.fields) }
+          : cmsProps,
       ]),
-  ),
-}));
+  );
+
+const BLOCK_CMS_FIELDS = indexByType((m) =>
+  toCmsFields({ ...CONTAINER_FIELDS, ...m.fields }),
+);
 
 /**
  * @typedef {Object} BlockDoc
@@ -236,12 +259,6 @@ const FIELD_TYPE_CHECKS = {
 
 const LIST_CHECK = { label: "an array", check: Array.isArray };
 
-/** Field types for wrapper keys (e.g. `dark`, `compact`) accepted on every block. */
-const COMMON_FIELD_TYPES = {
-  dark: { type: "boolean" },
-  compact: { type: "boolean" },
-};
-
 /**
  * Converts a `{type, list?}` field definition map to `[key, spec]` pairs
  * for constructing a per-block lookup table. The returned spec is
@@ -255,7 +272,8 @@ const specEntries = (defs) =>
     d.list ? LIST_CHECK : FIELD_TYPE_CHECKS[d.type],
   ]);
 
-const COMMON_SPEC_ENTRIES = specEntries(COMMON_FIELD_TYPES);
+/** Wrapper keys (`dark`, `compact`) accepted on every block. */
+const COMMON_SPEC_ENTRIES = specEntries(CONTAINER_FIELDS);
 
 /**
  * Pre-computed per-block lookup of `fieldName -> { label, check }`. Built
@@ -406,9 +424,7 @@ const validateBlock = (block, ctx) => {
 
   const specs = BLOCK_FIELD_SPECS[block.type];
   if (!specs) {
-    return [
-      `Unknown block type "${block.type}"${ctx}. Valid types: ${Object.keys(BLOCK_FIELD_SPECS).join(", ")}`,
-    ];
+    return [`Unknown block type "${block.type}"${ctx}. ${VALID_TYPES_MESSAGE}`];
   }
   return BLOCK_ERROR_COLLECTORS.flatMap((collect) =>
     collect(block, specs, ctx),
@@ -443,21 +459,90 @@ const validateBlocks = (blocks, context = "") => {
 };
 
 /**
+ * A supplied value with its nested fields' defaults filled: each object of
+ * an object list, or the object itself, recursively. Other values pass
+ * through unchanged.
+ * @param {{ fields?: Record<string, any>, list?: boolean }} field
+ * @param {unknown} value
+ * @returns {unknown}
+ */
+const fillValue = (field, value) => {
+  if (field.list && Array.isArray(value)) {
+    return value.map((item) => fillValue({ fields: field.fields }, item));
+  }
+  return field.fields && isObject(value)
+    ? fillDefaults(field.fields, value)
+    : value;
+};
+
+/**
+ * Returns `owner` with every omitted field filled from its schema `default`,
+ * recursing into supplied objects and object lists so nested fields (such as
+ * a button's variant) are filled too. A function default derives its value
+ * from the object that owns the field.
+ * @param {Record<string, any>} fields
+ * @param {Record<string, unknown>} owner
+ * @returns {Record<string, unknown>}
+ */
+const fillDefaults = (fields, owner) => ({
+  ...owner,
+  ...Object.fromEntries(
+    Object.entries(fields).flatMap(([key, field]) => {
+      const value = owner[key];
+      if (value !== undefined) return [[key, fillValue(field, value)]];
+      if (!("default" in field)) return [];
+      return [
+        [
+          key,
+          typeof field.default === "function"
+            ? field.default(owner)
+            : field.default,
+        ],
+      ];
+    }),
+  ),
+});
+
+/**
+ * Fills a validated block's omitted fields, common wrapper fields included,
+ * from its schema defaults, so templates never restate them.
+ * @param {Block} block
+ * @returns {Block}
+ */
+const applyBlockDefaults = (block) =>
+  fillDefaults(
+    { ...CONTAINER_FIELDS, ...BLOCK_SCHEMAS[String(block.type)] },
+    block,
+  );
+
+/**
+ * Validates blocks and fills their defaults: the one path authored blocks
+ * take before rendering, whether they come from page frontmatter or a
+ * snippet.
+ * @param {Block[]} blocks
+ * @param {string} context - Context for error messages (e.g., file path)
+ * @returns {Block[]}
+ */
+const normaliseBlocks = (blocks, context) => {
+  validateBlocks(blocks, context);
+  return blocks.map(applyBlockDefaults);
+};
+
+/**
  * Canonical example per block type, in BLOCK_MODULES order. Each entry's
  * `example` is a valid `blocks[]` entry: the block gallery page renders
  * them live and the test suite validates every one against its schema,
  * so each type always has one demonstrable, working usage.
  */
-const BLOCK_EXAMPLES = BLOCK_MODULES.map((m) => {
-  return {
-    type: m.type,
-    summary: m.docs.summary,
-    collections: "collections" in m ? m.collections : null,
-    example: m.example,
-  };
-});
+const BLOCK_EXAMPLES = BLOCK_MODULES.map((m) => ({
+  type: m.type,
+  summary: m.docs.summary,
+  collections: allowedCollections(m),
+  example: m.example,
+}));
 
 export {
+  applyBlockDefaults,
   BLOCK_CMS_FIELDS,
   BLOCK_DOCS,
   BLOCK_EXAMPLES,
@@ -466,6 +551,8 @@ export {
   getBlockContainerWidth,
   getBlockTemplate,
   isBlockAllowedIn,
+  isColumnSafeBlock,
+  normaliseBlocks,
   validateBlocks,
 };
 /* jscpd:ignore-end */

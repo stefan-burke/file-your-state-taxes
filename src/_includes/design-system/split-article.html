@@ -1,12 +1,9 @@
 {%- comment -%}
 Shared article (text side) of split-* layouts. Used by split.html and
 split-callout.html; see split.html for the full parameter documentation.
-
-Parameters (direct):
-  - reveal_content: data-reveal value for the article
 {%- endcomment -%}
 
-<article class="stack" data-reveal="{{ reveal_content }}">
+<article class="stack" data-reveal="{{ block.reveal_content }}">
   {%- if block.subtitle -%}
     <p class="text-muted">{{ block.subtitle }}</p>
   {%- endif -%}

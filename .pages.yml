@@ -469,6 +469,7 @@ components:
           - { name: text, type: string, label: Button Text, required: true }
           - { name: href, type: string, label: URL, required: true }
           - { name: variant, type: string, label: Variant }
+          - { name: size, type: string, label: Size }
       - { name: right_content, type: rich-text, label: Right Content }
       - name: right_button
         type: object
@@ -477,6 +478,7 @@ components:
           - { name: text, type: string, label: Button Text, required: true }
           - { name: href, type: string, label: URL, required: true }
           - { name: variant, type: string, label: Variant }
+          - { name: size, type: string, label: Size }
       - { name: reveal_left, type: string, label: Reveal Left Animation }
       - { name: reveal_right, type: string, label: Reveal Right Animation }
   block_split_html:

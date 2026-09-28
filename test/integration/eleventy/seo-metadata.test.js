@@ -21,7 +21,9 @@ const getBreadcrumbNames = (schema) =>
 
 describe("generated SEO metadata", () => {
   const getSite = useSharedSite({
-    config: { placeholder_images: false },
+    // The breadcrumb schema is emitted only when breadcrumbs are shown, which
+    // a site's own config may turn off.
+    config: { placeholder_images: false, show_breadcrumbs: true },
     files: [
       {
         path: "pages/normal.md",
@@ -119,7 +121,7 @@ describe("generated SEO metadata", () => {
       description: "Structured news description",
       image: `${SITE_URL}/images/placeholders/green.svg`,
       author: { "@type": "Person", name: "Jane SEO" },
-      publisher: { "@type": "Organization", name: "CfA Static" },
+      publisher: { "@type": "Organization", name: siteData.name },
       datePublished: "2024-02-03",
     });
   });

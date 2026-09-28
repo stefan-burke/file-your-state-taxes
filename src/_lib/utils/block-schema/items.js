@@ -2,6 +2,7 @@
 import {
   collectionField,
   ITEMS_FILTERABLE_FIELDS,
+  ITEMS_GRID_META,
 } from "#utils/block-schema/shared.js";
 
 export const type = "items";
@@ -16,7 +17,7 @@ export const fields = {
 export const docs = {
   summary:
     "Displays an Eleventy collection as a card grid or horizontal slider.",
-  scss: "src/css/design-system/_items.scss",
+  scss: ITEMS_GRID_META.scss,
 };
 
 export const example = {

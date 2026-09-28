@@ -3,19 +3,10 @@ Call-to-action block with gradient background.
 
 Parameters (via block object):
   - block.content: Markdown content with optional heading (required, rendered as markdown)
-  - block.button: Button object with:
-    - text: Button label
-    - href: Link URL
-    - variant: Button variant (default: "secondary")
-    - size: Button size (default: "lg")
+  - block.button: Optional button object { text, href, variant, size }
   - block.reveal: If set, adds data-reveal animation
 {%- endcomment -%}
 
 <aside class="cta"{% if block.reveal %} data-reveal="{{ block.reveal }}"{% endif %}>
-  {%- if block.button.size == "sm" -%}
-    {%- assign content_button_size = "sm" -%}
-  {%- else -%}
-    {%- assign content_button_size = "lg" -%}
-  {%- endif -%}
   {%- include "design-system/block-content-button.html" -%}
 </aside>

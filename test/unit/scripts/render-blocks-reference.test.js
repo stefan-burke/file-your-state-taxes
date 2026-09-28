@@ -120,8 +120,8 @@ describe("block reference", () => {
       ),
     ).toEqual(Object.keys(CONTAINER_FIELDS));
     expect(tableRows(renderFieldTable(CONTAINER_FIELDS))).toEqual([
-      ["dark", "boolean", "optional", "Not documented", "Dark", ""],
-      ["compact", "boolean", "optional", "Not documented", "Compact", ""],
+      ["dark", "boolean", "optional", "false", "Dark", ""],
+      ["compact", "boolean", "optional", "None", "Compact", ""],
     ]);
   });
 
@@ -242,9 +242,10 @@ describe("full field schema rendering", () => {
     [false, "false"],
     [0, "0"],
     ["", '""'],
-    [undefined, "Not documented"],
-    ['"center"', '"center"'],
-  ])("preserves documented default %j independently from required presence", (value, displayed) => {
+    [undefined, "None"],
+    ["center", '"center"'],
+    [({ reverse }) => (reverse ? "right" : "left"), "Derived"],
+  ])("preserves default %j independently independently from required presence", (value, displayed) => {
     const rows = tableRows(
       renderFieldTable({
         setting: { type: "string", required: true, default: value },
@@ -261,7 +262,7 @@ describe("full field schema rendering", () => {
         type: "string",
         label,
         description,
-        default: "`x`|<b>\r\nnext",
+        default: "`x`|<b>",
       },
     });
     const rendered = parseMarkdown(source);
@@ -272,7 +273,7 @@ describe("full field schema rendering", () => {
       "a|`b",
       "string",
       "optional",
-      "`x`|<b>next",
+      '"`x`|<b>"',
       label,
       "`code` | <script>alert(1)</script>**not emphasis**",
     ]);
@@ -280,7 +281,6 @@ describe("full field schema rendering", () => {
       0,
     );
     expect(cells[5].querySelectorAll("br")).toHaveLength(1);
-    expect(cells[3].querySelectorAll("br")).toHaveLength(1);
   });
 
   test("documents actual nested fields omitted from the old flattened reference", () => {
@@ -289,7 +289,7 @@ describe("full field schema rendering", () => {
       "items[].icon_label",
       "string",
       "optional",
-      "Not documented",
+      "None",
       "Icon Accessible Label",
       "",
     ]);
@@ -297,7 +297,7 @@ describe("full field schema rendering", () => {
       "buttons[].text",
       "string",
       "required",
-      "Not documented",
+      "None",
       "Button Text",
       "",
     ]);
@@ -305,7 +305,7 @@ describe("full field schema rendering", () => {
       "buttons[].href",
       "string",
       "required",
-      "Not documented",
+      "None",
       "URL",
       "",
     ]);
@@ -313,7 +313,7 @@ describe("full field schema rendering", () => {
       "items[].description",
       "markdown",
       "optional",
-      "Not documented",
+      "None",
       "Description",
       "",
     ]);

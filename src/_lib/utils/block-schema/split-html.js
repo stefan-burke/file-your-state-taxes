@@ -1,11 +1,13 @@
 /* jscpd:ignore-start -- block schema declaration data */
+import { md } from "#utils/block-schema/shared.js";
 import {
-  md,
   SPLIT_BASE_DOCS,
   SPLIT_BASE_FIELDS,
 } from "#utils/block-schema/split-shared.js";
 
 export const type = "split-html";
+
+export const columnSafe = false;
 export const template = "design-system/split.html";
 
 export const fields = {

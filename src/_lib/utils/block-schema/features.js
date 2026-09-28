@@ -3,9 +3,8 @@ import {
   bool,
   INTRO_CONTENT_FIELD,
   md,
-  NAME_REQUIRED,
   objectList,
-  REVEAL_BOOLEAN_FIELD,
+  revealToggleField,
   str,
 } from "#utils/block-schema/shared.js";
 
@@ -16,7 +15,7 @@ export const fields = {
     ...objectList("Features", {
       icon: str("Icon (Iconify ID or HTML entity)"),
       icon_label: str("Icon Accessible Label"),
-      name: NAME_REQUIRED,
+      name: str("Name", { required: true }),
       description: md("Description"),
       style: str("Custom Style"),
     }),
@@ -25,10 +24,10 @@ export const fields = {
       'Feature objects. Each: `{icon, icon_label, name, description, style}`. Icon can be an Iconify ID (`"prefix:name"`), image path (`"/images/foo.svg"`), or raw HTML/emoji.',
   },
   intro_content: INTRO_CONTENT_FIELD,
-  reveal: REVEAL_BOOLEAN_FIELD,
+  reveal: revealToggleField("each feature"),
   center: {
     ...bool("Centered"),
-    default: "false",
+    default: false,
     description: "If true, centers feature text.",
   },
 };

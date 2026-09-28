@@ -2,6 +2,7 @@
 import {
   INTRO_CONTENT_FIELD,
   objectList,
+  revealToggleField,
   str,
 } from "#utils/block-schema/shared.js";
 
@@ -24,11 +25,7 @@ export const fields = {
     description:
       'Link objects. Each: `{icon, text, url}`. `url` is optional — items without it render as plain text. Icon can be an Iconify ID (`"prefix:name"`), image path, or raw HTML/emoji.',
   },
-  reveal: {
-    type: "boolean",
-    default: "true",
-    description: "Adds `data-reveal` to each link item.",
-  },
+  reveal: revealToggleField("each link item"),
 };
 
 export const docs = {

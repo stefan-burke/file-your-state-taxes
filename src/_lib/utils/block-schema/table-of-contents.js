@@ -8,13 +8,13 @@ export const containerWidth = "narrow";
 export const fields = {
   title: {
     ...str("Title"),
-    default: '"On this page"',
+    default: "On this page",
     description:
       "Heading above the list, and the accessible name of the navigation landmark.",
   },
   levels: {
     ...str("Heading Levels"),
-    default: '"2,3"',
+    default: "2,3",
     description:
       'Comma-separated heading levels to list, from `2` to `6`. Every other level is left out of the list, so `"2"` gives a top-level-only contents. An unlistable level fails the build.',
   },

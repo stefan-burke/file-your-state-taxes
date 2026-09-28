@@ -8,7 +8,7 @@ export const containerWidth = "narrow";
 export const fields = {
   variant: {
     ...str("Variant (info | warning | success | danger)"),
-    default: '"info"',
+    default: "info",
     description:
       'Color scheme: `"info"`, `"warning"`, `"success"`, or `"danger"`.',
   },

@@ -12,7 +12,7 @@ export const fields = {
   },
   align: {
     type: "string",
-    default: '"center"',
+    default: "center",
     description: 'Text alignment. `"center"` adds `.text-center`.',
   },
   class: { type: "string", description: "Extra CSS classes." },

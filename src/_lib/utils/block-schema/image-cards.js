@@ -1,25 +1,32 @@
 /* jscpd:ignore-start -- block schema declaration data */
 import {
+  IMAGE_ASPECT_RATIO_FIELD,
+  INTRO_CONTENT_FIELD,
   ITEMS_GRID_META,
-  imageCardGridFields,
   img,
   objectList,
+  revealToggleField,
   str,
 } from "#utils/block-schema/shared.js";
 
 export const type = "image-cards";
 
-export const fields = imageCardGridFields({
-  ...objectList("Cards", {
-    image: img("Image", { required: true }),
-    name: str("Name", { required: true }),
-    description: str("Description"),
-    link: str("Link URL"),
-  }),
-  required: true,
-  description:
-    "Card objects. Each: `{image, name, description, link}`. Images processed by `{% image %}` shortcode for responsive srcset + LQIP.",
-});
+export const fields = {
+  items: {
+    ...objectList("Cards", {
+      image: img("Image", { required: true }),
+      name: str("Name", { required: true }),
+      description: str("Description"),
+      link: str("Link URL"),
+    }),
+    required: true,
+    description:
+      "Card objects. Each: `{image, name, description, link}`. Images processed by `{% image %}` shortcode for responsive srcset + LQIP.",
+  },
+  reveal: revealToggleField("each card"),
+  image_aspect_ratio: IMAGE_ASPECT_RATIO_FIELD,
+  intro_content: INTRO_CONTENT_FIELD,
+};
 
 export const docs = {
   summary:

@@ -2,12 +2,9 @@
 Renders the optional markdown intro for a block.
 
 Expects:
-  block - the block frontmatter object
-  items - (optional) when truthy, the block is being embedded with an items
-          array, so the intro is skipped.
+  block - the block frontmatter object, or false when a block template is
+          embedded as another block's figure
 {%- endcomment -%}
 {%- if block.intro_content -%}
-  {%- unless items -%}
-    <div class="prose">{{ block.intro_content | renderContent: "md" }}</div>
-  {%- endunless -%}
+  <div class="prose">{{ block.intro_content | renderContent: "md" }}</div>
 {%- endif -%}

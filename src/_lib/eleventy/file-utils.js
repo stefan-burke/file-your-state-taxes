@@ -3,6 +3,8 @@ import path from "node:path";
 import matter from "gray-matter";
 import markdownIt from "markdown-it";
 import { registerFilters } from "#eleventy/register.js";
+import { toBlockArray } from "#utils/block-columns.js";
+import { normaliseBlocks } from "#utils/block-schema.js";
 import { memoize } from "#utils/fp/memoize.js";
 import { processLiquidStrings } from "#utils/liquid-render.js";
 import { validateSidebarBlocks } from "#utils/sidebar-blocks.js";
@@ -113,24 +115,43 @@ const ensureDir = (dirPath) => {
 };
 
 /**
+ * Snippet file path for a reference: a bare name, or the
+ * `src/snippets/<name>.md` path Pages CMS saves.
+ * @param {string} name
+ * @param {string} baseDir
+ */
+const snippetPath = (name, baseDir) =>
+  path.join(
+    baseDir,
+    "src/snippets",
+    `${path.basename(name, path.extname(name))}.md`,
+  );
+
+/**
  * @param {string} name
  * @param {string} [baseDir]
  */
 const loadSnippet = (name, baseDir = process.cwd()) => {
-  const snippetName = path.basename(name, path.extname(name));
-  const snippetPath = path.join(baseDir, "src/snippets", `${snippetName}.md`);
-  return fs.existsSync(snippetPath) ? matter.read(snippetPath) : null;
+  const file = snippetPath(name, baseDir);
+  return fs.existsSync(file) ? matter.read(file) : null;
 };
 
 const readSnippetData = memoize(
   /**
+   * A snippet's frontmatter, empty when the snippet does not exist. Its
+   * `blocks` are validated and default-filled exactly like page blocks.
    * @param {string} name
    * @param {string} [baseDir]
    * @returns {SnippetData}
    */
   (name, baseDir = process.cwd()) => {
-    const parsed = loadSnippet(name, baseDir);
-    return parsed ? parsed.data : {};
+    const data = loadSnippet(name, baseDir)?.data;
+    if (!data) return {};
+    if (!data.blocks) return data;
+    return {
+      ...data,
+      blocks: normaliseBlocks(data.blocks, ` in snippet "${name}"`),
+    };
   },
   { cacheKey: cacheKeyFromArgs },
 );
@@ -160,39 +181,32 @@ const renderSnippet = memoize(
 const snippetDataFilter = (name) => readSnippetData(name);
 
 /**
- * @this {LiquidFilterContext}
+ * The blocks a `snippet` block renders. The referenced snippet must exist:
+ * a dangling reference fails the build instead of silently rendering
+ * nothing. Liquid in the blocks resolves in blocks.html, like page blocks.
  * @param {string} name
  */
-async function snippetBlocksFilter(name) {
-  return resolveSnippetBlocks(name, this.context.environments);
-}
-
-/**
- * Reads a snippet's blocks, optionally validates them, and resolves Liquid
- * expressions against the page context.
- *
- * @param {string} name
- * @param {Record<string, unknown>} context
- * @param {(blocks: any[]) => Record<string, unknown>[]} [validate]
- */
-const resolveSnippetBlocks = (name, context, validate = (blocks) => blocks) => {
-  const data = readSnippetData(name);
-  if (!data?.blocks) return [];
-  return processLiquidStrings(validate(data.blocks), context);
+const snippetBlocksFilter = (name) => {
+  if (!fs.existsSync(snippetPath(name, process.cwd()))) {
+    throw new Error(
+      `Snippet block references "${name}", but src/snippets/ has no such snippet`,
+    );
+  }
+  return toBlockArray(readSnippetData(name).blocks);
 };
 
 /**
- * Like snippet_blocks, but enforces that every block type is safe inside the
- * narrow right-content sidebar column.
+ * The optional right-content sidebar's blocks, restricted to column-safe
+ * types, with Liquid resolved against the page (they render without
+ * blocks.html).
  *
  * @this {LiquidFilterContext}
  * @param {string} name
  */
 async function sidebarBlocksFilter(name) {
-  return resolveSnippetBlocks(
-    name,
+  return processLiquidStrings(
+    validateSidebarBlocks(readSnippetData(name).blocks),
     this.context.environments,
-    validateSidebarBlocks,
   );
 }
 
@@ -221,6 +235,7 @@ const configureFileUtils = (eleventyConfig) => {
 
   registerFilters(eleventyConfig)({
     snippet_data: snippetDataFilter,
+    snippet_blocks: snippetBlocksFilter,
     markdown: /** @param {string | null | undefined} str */ (str) =>
       str ? mdRenderer.render(str) : "",
   });
@@ -228,7 +243,6 @@ const configureFileUtils = (eleventyConfig) => {
     eleventyConfig,
     "addAsyncFilter",
   )({
-    snippet_blocks: snippetBlocksFilter,
     sidebar_blocks: sidebarBlocksFilter,
     render_block_liquid: renderBlockLiquidFilter,
   });

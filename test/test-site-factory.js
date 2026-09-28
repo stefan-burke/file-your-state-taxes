@@ -423,4 +423,21 @@ const useSharedSite = (options) => {
 // whole run, never mid-run: parallel workers build sibling sites in the same
 // root, so removing it from inside any single test file would race them.
 
-export { createTestSite, useSharedSite, withSetupTestSite, withTestSite };
+/**
+ * A standalone page file carrying the given design-system blocks, served at
+ * `/<slug>/`.
+ * @param {string} slug
+ * @param {Record<string, unknown>[]} blocks
+ */
+const pageWithBlocks = (slug, blocks) => ({
+  path: `pages/${slug}.md`,
+  frontmatter: { name: slug, permalink: `/${slug}/`, blocks },
+});
+
+export {
+  createTestSite,
+  pageWithBlocks,
+  useSharedSite,
+  withSetupTestSite,
+  withTestSite,
+};

@@ -8,7 +8,7 @@ describe("validateSidebarBlocks", () => {
   test("returns column-safe blocks unchanged", () => {
     const blocks = [
       { type: "markdown", content: "Hello" },
-      { type: "cta", title: "Call us" },
+      { type: "cta", content: "Call us" },
     ];
     expect(validateSidebarBlocks(blocks)).toEqual(blocks);
   });
@@ -20,13 +20,18 @@ describe("validateSidebarBlocks", () => {
 
   test.each([
     "hero",
-    "video-background",
-    "bunny-video-background",
     "image-background",
     "marquee-images",
+    "split-full",
   ])("rejects full-width %s in the sidebar", (type) => {
     expect(() => validateSidebarBlocks([{ type }])).toThrow(
       `Block type "${type}" is not supported inside the right-content sidebar.`,
+    );
+  });
+
+  test("throws for an unregistered type", () => {
+    expect(() => validateSidebarBlocks([{ type: "video-background" }])).toThrow(
+      'Unknown block type "video-background"',
     );
   });
 

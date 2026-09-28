@@ -5,16 +5,6 @@ badge/content/buttons parameters. Hero-specific:
 
   - block.class: Additional CSS classes (e.g., "gradient")
   - block.reveal: If set, adds data-reveal animation
-
-Usage:
-  {% include "design-system/blocks/hero.html",
-     block: {
-       badge: "New Release",
-       content: "# Welcome to Our Site\n\nA short description here",
-       buttons: page.hero_buttons,
-       class: "gradient"
-     }
-  %}
 {%- endcomment -%}
 
 <header class="hero{% if block.class %} {{ block.class }}{% endif %}"{% if block.reveal %} data-reveal="{{ block.reveal }}"{% endif %}>

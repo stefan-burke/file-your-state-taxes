@@ -2,7 +2,7 @@ import getConfig from "#data/config.js";
 import { getFirstValidImage } from "#media/image-frontmatter.js";
 import { getPlaceholderForPath } from "#media/thumbnail-placeholder.js";
 import { buildGalleryBlocks } from "#utils/block-gallery.js";
-import { collectBlockErrors } from "#utils/block-schema.js";
+import { applyBlockDefaults, collectBlockErrors } from "#utils/block-schema.js";
 import { languageForUrl, translationForUrl } from "#utils/i18n.js";
 import { withNavigationAnchor } from "#utils/navigation-utils.js";
 import {
@@ -19,32 +19,6 @@ import { collectItemErrors } from "#utils/validate-item.js";
  */
 const throwIfNotEmpty = (messages) => {
   if (messages.length > 0) throw new Error(messages.join("\n"));
-};
-
-/**
- * The reveal-figure default shared by every split-* block.
- * @type {Record<string, unknown>}
- */
-const SPLIT_DEFAULTS = { reveal_figure: "scale" };
-
-/**
- * Default values for block types. Applied at build time so templates
- * don't need to handle defaults.
- * @type {Record<string, Record<string, unknown>>}
- */
-const BLOCK_DEFAULTS = {
-  features: { reveal: true, center: false },
-  stats: { reveal: true },
-  "split-image": SPLIT_DEFAULTS,
-  "split-code": SPLIT_DEFAULTS,
-  "split-icon-links": SPLIT_DEFAULTS,
-  "split-html": SPLIT_DEFAULTS,
-  "split-callout": SPLIT_DEFAULTS,
-  "section-header": { align: "center" },
-  "image-cards": { reveal: true },
-  "code-block": { reveal: true },
-  "icon-links": { reveal: true },
-  downloads: { reveal: true },
 };
 
 export default {
@@ -160,7 +134,7 @@ export default {
   },
 
   /**
-   * Validates and applies default values to blocks. Works for any content
+   * Validates blocks and fills their schema defaults. Works for any content
    * with blocks.
    * A page flagged `block_gallery` builds its blocks from the canonical
    * per-type examples instead of frontmatter - see #utils/block-gallery.js.
@@ -170,32 +144,17 @@ export default {
    */
   blocks: async (data) => {
     const context = ` in ${data.page.inputPath}`;
-    const itemErrors = collectItemErrors(data, context);
     const sourceBlocks = data.block_gallery
       ? buildGalleryBlocks()
       : data.blocks;
     if (!sourceBlocks) {
-      throwIfNotEmpty(itemErrors);
+      throwIfNotEmpty(collectItemErrors(data, context));
       return sourceBlocks;
     }
-    const allErrors = [
-      ...itemErrors,
+    throwIfNotEmpty([
+      ...collectItemErrors(data, context),
       ...collectBlockErrors(sourceBlocks, context),
-    ];
-    throwIfNotEmpty(allErrors);
-    return sourceBlocks.map(
-      /** @param {Record<string, unknown>} block */ (block) => {
-        const blockType = String(block.type);
-        const merged = Object.assign(
-          { dark: false },
-          BLOCK_DEFAULTS[blockType],
-          block,
-        );
-        if (blockType.startsWith("split-") && !block.reveal_content) {
-          merged.reveal_content = block.reverse ? "right" : "left";
-        }
-        return merged;
-      },
-    );
+    ]);
+    return sourceBlocks.map(applyBlockDefaults);
   },
 };

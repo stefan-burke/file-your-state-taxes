@@ -8,25 +8,16 @@ Parameters (via block object):
     - name: Feature title
     - description: Feature description (supports markdown)
     - style: Optional inline styles (e.g., for custom colors)
-  - block.reveal: If true, adds data-reveal animation (default: true)
-  - block.center: If true, centers feature text (default: false)
+  - block.reveal: If true, adds data-reveal animation
+  - block.center: If true, centers feature text
   - block.intro_content: Optional markdown intro rendered above the grid
-
-Embeddable form:
-  - items: pass an items array directly (skips intro_content); reveal still
-    follows block.reveal (default true) so the embedding caller can suppress
-    animations by passing block: { reveal: false }.
-
-Usage:
-  {% include "design-system/blocks/features.html", block: page.features_block %}
-  {% include "design-system/blocks/features.html", items: page.spec_feature_items %}
 {%- endcomment -%}
 
 {%- include "design-system/block-intro.html" -%}
 <ul class="features{% if block.center %} text-center{% endif %}" role="list">
-  {%- for item in items | default: block.items -%}
+  {%- for item in block.items -%}
   <li>
-    <article class="feature"{% if block.reveal | default: true %} data-reveal{% endif %}{% if item.style %} style="{{ item.style }}"{% endif %}>
+    <article class="feature"{% if block.reveal %} data-reveal{% endif %}{% if item.style %} style="{{ item.style }}"{% endif %}>
       {%- if item.icon -%}
         {%- include "design-system/icon-badge.html", icon: item.icon, label: item.icon_label -%}
       {%- endif -%}

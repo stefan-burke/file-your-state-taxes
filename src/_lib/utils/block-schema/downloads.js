@@ -2,6 +2,7 @@
 import {
   INTRO_CONTENT_FIELD,
   objectList,
+  revealToggleField,
   str,
 } from "#utils/block-schema/shared.js";
 
@@ -24,11 +25,7 @@ export const fields = {
     required: true,
     description: ITEMS_DESCRIPTION,
   },
-  reveal: {
-    type: "boolean",
-    default: "true",
-    description: "Adds `data-reveal` to each download item.",
-  },
+  reveal: revealToggleField("each download item"),
 };
 
 export const docs = {

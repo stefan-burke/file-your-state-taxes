@@ -184,9 +184,9 @@ blocks:
     reference: shared-contact-prompt
 ```
 
-Create `src/snippets/shared-contact-prompt.md` before using that reference.
-Missing snippet references currently render no blocks instead of failing the
-build, so inspect every page that consumes one. The generated PagesCMS snippet
+Create `src/snippets/shared-contact-prompt.md` before using that reference. A
+missing snippet fails the build, and snippet blocks are validated like page
+blocks. The generated PagesCMS snippet
 form edits name and Markdown body; block-based snippet frontmatter currently
 requires direct source editing.
 

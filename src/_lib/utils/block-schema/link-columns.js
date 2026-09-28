@@ -3,7 +3,6 @@ import {
   collectionField,
   FILTER_FIELD,
   INTRO_CONTENT_FIELD,
-  ITEMS_COMMON_FIELDS,
   str,
 } from "#utils/block-schema/shared.js";
 
@@ -14,10 +13,7 @@ export const fields = {
     'Name of an Eleventy collection (e.g. `"locations"`, `"services"`).',
   ),
   intro_content: INTRO_CONTENT_FIELD,
-  filter: {
-    ...FILTER_FIELD,
-    description: ITEMS_COMMON_FIELDS.filter.description,
-  },
+  filter: FILTER_FIELD,
   remove_text: {
     ...str("Remove Text (Regex)"),
     description:

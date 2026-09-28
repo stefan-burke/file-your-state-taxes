@@ -1,5 +1,9 @@
 /* jscpd:ignore-start -- block schema declaration data */
-import { INTRO_CONTENT_FIELD, str } from "#utils/block-schema/shared.js";
+import {
+  INTRO_CONTENT_FIELD,
+  revealToggleField,
+  str,
+} from "#utils/block-schema/shared.js";
 
 export const type = "code-block";
 
@@ -20,11 +24,7 @@ export const fields = {
     description:
       "Sets `data-language` attribute (for future syntax highlighting).",
   },
-  reveal: {
-    type: "boolean",
-    default: "true",
-    description: "`data-reveal` value.",
-  },
+  reveal: revealToggleField("the code block"),
 };
 
 export const docs = {
