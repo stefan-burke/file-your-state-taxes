@@ -1,24 +1,18 @@
 {
-	"name": "CfA Static",
-	"url": "https://cfa-static.apps.dev.services.cfa.codes",
-	"description": "A static-site template for informational and marketing sites, derived from the Chobble Template.",
-	"socials": {
-		"Github": "https://github.com/codeforamerica/cfa-static",
-		"RSS": "/feed.xml"
-	},
+	"name": "FileYourStateTaxes",
+	"url": "https://www.fileyourstatetaxes.org",
+	"description": "A free state filing service for taxpayers using IRS Direct File.",
+	"logo": "/images/fyst-logo.svg",
 	"cms_config": {
 		"collections": [
 			"pages",
-			"news",
-			"guide-categories",
-			"guide-pages",
 			"snippets"
 		],
 		"features": {
 			"permalinks": true,
 			"redirects": true,
-			"faqs": true,
-			"galleries": true,
+			"faqs": false,
+			"galleries": false,
 			"external_navigation_urls": true,
 			"use_visual_editor": true,
 			"no_index": true
