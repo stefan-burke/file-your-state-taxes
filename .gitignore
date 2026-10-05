@@ -177,3 +177,7 @@ src/assets/icons/iconify/test/
 
 # cpd.test.js writes its report fixture here
 test/unit/scripts/.cpd-report-fixture/
+
+# Site mirror: scraped ground truth and template-friction notes (never shipped)
+upstream.txt
+.mirror-scratch/

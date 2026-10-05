@@ -1,15 +1,874 @@
-// Default Theme - matches design-system defaults from _variables.scss
+// FileYourStateTaxes theme
+// Palette, type and chrome mirrored from www.fileyourstatetaxes.org (captured
+// 2026-10-05). Values are the live site's computed styles; see
+// .mirror-scratch/NOTES.md for the capture.
+
+// Brand fonts: the variable Inter and Geologica files the live site serves
+// (SIL Open Font License 1.1), in latin-ext and latin subsets.
+$latin-ext-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+$latin-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+
+@each $family, $file in ("Inter": "inter", "Geologica": "geologica") {
+  @each $subset, $range in ("latin-ext": $latin-ext-range, "latin": $latin-range) {
+    @font-face {
+      font-family: $family;
+      font-weight: 400 700;
+      font-style: normal;
+
+      font-display: swap;
+      src: url("../assets/fonts/#{$file}-#{$subset}-wght-normal.woff2") format("woff2");
+      unicode-range: $range;
+    }
+  }
+}
+
+// Bold body-type headings, as the live site sets its minor headings
+@mixin body-type-heading {
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: normal;
+}
+
+// The live white card: answers and the SMS terms
+@mixin white-card($padding: 20px) {
+  padding: $padding;
+  border: 2px solid var(--fyst-card-border);
+  border-radius: 6px;
+  background: var(--color-card-bg);
+}
+
 :root {
-  --color-bg: #fafafa;
-  --body-background: #fafafa;
-  --body-background-alt: #f0f1f3;
-  --color-card-bg: #fff;
-  --color-text: #1f2937;
-  --color-text-muted: #5b6270;
-  --color-link: #2563eb;
-  --color-link-hover: #1d4ed8;
-  --color-tint: #dbeafe;
-  --color-secondary: #7c3aed;
-  --color-accent: #ebebeb;
-  --color-hover-bg: rgb(0 0 0 / 5%);
+  // Cream page, black ink, teal links; the chrome (header, footer, primary
+  // buttons, mobile menu) is charcoal unless a state's pages recolor it below.
+  --fyst-chrome: #3C3A3A;
+  --fyst-page-edge: var(--fyst-chrome);
+  --fyst-card-border: #B2B2B2;
+  --fyst-focus-link: #C2850C;
+  --fyst-focus-button: #1A8CFF;
+  --color-bg: #FBFCF7;
+  --body-background: #FBFCF7;
+  --body-background-alt: #FBFCF7;
+  --color-card-bg: #FFF;
+  --color-text: #000;
+  --color-text-muted: #3C3A3A;
+  --color-link: #007C7C;
+  --color-link-hover: #007C7C;
+  --color-tint: #FFF2D1;
+  --color-secondary: #3C3A3A;
+  --color-accent: #C6F9EC;
+  --color-hover-bg: #F7F5F4;
+  --color-dark-bg: #3C3A3A;
+  --color-dark-bg-alt: #3C3A3A;
+  --color-dark-text: #FFF;
+  --color-dark-text-muted: #FFF;
+  --color-dark-link: #FFF;
+  --color-contrast-text: #FFF;
+  --font-family-body: "Inter", "Helvetica Neue", -apple-system, blinkmacsystemfont, "Segoe UI", roboto, oxygen, ubuntu, cantarell, "Fira Sans", "Droid Sans", sans-serif;
+  --font-family-heading: "Geologica", var(--font-family-body);
+  --link-decoration: underline;
+  --link-decoration-hover: underline;
+  --border-radius: 4px;
+  --list-marker-content: normal;
+  --list-marker-color: currentcolor;
+}
+
+// Each state's FAQ pages wear that state's color on the live site (its
+// header, footer, page edge and menu); the US hub keeps the charcoal. The
+// selectors match the page class the template derives from the URL, e.g.
+// page--en--nj--faq and page--es--nj--faq--how-is-my-….
+html:has(body[class*="--id--faq"]) {
+  --fyst-chrome: #30462F;
+}
+
+html:has(body[class*="--md--faq"]) {
+  --fyst-chrome: #2A3760;
+}
+
+html:has(body[class*="--nc--faq"]) {
+  --fyst-chrome: #092940;
+}
+
+html:has(body[class*="--nj--faq"]) {
+  --fyst-chrome: #112F4E;
+}
+
+html:has(body[class*="--ny--faq"]) {
+  --fyst-chrome: #184A72;
+}
+
+// The US hub and the 404 carry no state color on the live site, so their
+// page edge is the app's navy canvas while their chrome stays charcoal
+html:has(body[class*="--us--faq"]),
+html:has(body.page--404-html) {
+  --fyst-page-edge: #001E29;
+}
+
+// The page edge shows past the footer on short pages, as on the live site
+html {
+  background: var(--fyst-page-edge);
+}
+
+body.design-system {
+  font-size: 16px;
+  line-height: normal;
+  background: var(--color-bg);
+}
+
+// ---------------------------------------------------------------------------
+// Skip link: the live site's mint tab, sliding down from the top on focus
+// ---------------------------------------------------------------------------
+.design-system .skip-link {
+  position: fixed;
+  z-index: 1001;
+  top: 0;
+  left: 0;
+  transform: translateY(-100%);
+
+  padding: 15px;
+  border-radius: 0 0 5px;
+
+  font-weight: 700;
+  color: #000;
+  text-decoration: underline;
+
+  background: var(--color-accent);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 30%);
+
+  transition: transform 0.3s;
+
+  &:focus {
+    transform: translateY(0);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Header: a 51px sticky chrome bar, content in the live site's 960px toolbar
+// with 35px page gutters (15px on phones). Desktop shows the logo and the
+// language link only; below 601px the menu folds behind "Menu" (the live
+// breakpoints: the language link hides below 481px, "Menu" shows below 601px).
+// ---------------------------------------------------------------------------
+.design-system nav.site-nav {
+  --header-height: 51px;
+
+  position: sticky;
+  z-index: 1000;
+  top: 0;
+
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: space-between;
+
+  height: var(--header-height);
+  min-height: 0;
+  margin: 0;
+  // The live bar is 54px tall with its top 3px above the viewport, so its
+  // content centres 1.5px above this 51px bar's middle
+  padding: 0 max(35px, calc(50% - 480px)) 3px;
+  border-radius: 0;
+
+  color: #FFF;
+
+  background: var(--fyst-chrome);
+  box-shadow: none;
+
+  .site-logo {
+    flex: 0 0 auto;
+  }
+
+  .site-logo img {
+    width: 222px;
+    height: 38px;
+  }
+
+  .language-links {
+    gap: 15px;
+
+    a {
+      display: inline-block;
+
+      font-size: 15px;
+      line-height: 25px;
+      color: #FFF;
+      text-decoration: underline;
+    }
+  }
+
+  // The live desktop header carries no menu links
+  .site-menu {
+    display: none;
+  }
+
+  &[data-menu][data-collapse] .menu-toggle {
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 25px;
+    color: #FFF;
+    text-decoration: underline;
+
+    background: none;
+  }
+
+  &[data-menu][data-collapse] .menu-toggle-icon {
+    display: none;
+  }
+
+  @media (width < 601px) {
+    padding-inline: 15px;
+
+    // Matching the template's collapsed-menu selector so these rules win
+    &[data-menu][data-collapse] .menu-toggle {
+      display: block;
+      order: 2;
+    }
+
+    // The open menu: a full-screen chrome panel under the header, links
+    // centered in 60px rows, the close X in the header's right corner
+    &[data-menu="open"][data-collapse] .site-menu {
+      position: fixed;
+      inset: var(--header-height) 0 0;
+      transform: none;
+
+      display: block;
+
+      width: auto;
+      max-height: none;
+      padding: 10px 18px 18px;
+      // The live panel starts 3px below the bar, where its 58% black page
+      // overlay shows through as a grey strip
+      border-top: 3px solid rgb(0 0 0 / 58%);
+      border-radius: 0;
+
+      background: var(--fyst-chrome);
+      background-clip: padding-box;
+      box-shadow: none;
+    }
+
+    &[data-menu][data-collapse] .site-menu > ul {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      align-items: stretch;
+
+      margin: 0;
+      padding: 0;
+
+      list-style: none;
+
+      > li {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 60px;
+      }
+
+      a {
+        font-size: 22px;
+        font-weight: 500;
+        color: #FFF;
+        text-decoration: underline;
+      }
+
+      .nav-caret {
+        display: none;
+      }
+    }
+
+    &[data-menu="open"][data-collapse] .menu-close {
+      cursor: pointer;
+
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      right: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 54px;
+      height: var(--header-height);
+      border: 0;
+
+      color: #FFF;
+
+      background: var(--fyst-chrome);
+
+      &::before {
+        content: "";
+
+        width: 27px;
+        height: 27px;
+
+        background: currentcolor;
+
+        mask: url("../assets/fyst/close.svg") center / contain no-repeat;
+      }
+
+      svg {
+        display: none;
+      }
+    }
+  }
+
+  @media (width < 481px) {
+    .language-links {
+      display: none;
+    }
+  }
+}
+
+// The template's left-nav layout stacks the expanded menu in a column from
+// md up (top-aligned, with a bottom margin); its selector is matched so the
+// live single-row bar wins.
+.design-system.left-nav nav.site-nav:not([data-menu][data-collapse="always"]) {
+  align-items: center;
+  margin-bottom: 0;
+
+  .language-links,
+  .language-links li {
+    flex-direction: row;
+    width: auto;
+  }
+}
+
+html[data-menu-open] body {
+  overflow: hidden;
+}
+
+// ---------------------------------------------------------------------------
+// Page body: the live main column runs the full width inside 35px gutters
+// (15px on phones), with no section bands. Each block's section supplies the
+// live site's vertical rhythm through its padding, set per page type below.
+// ---------------------------------------------------------------------------
+.design-system main#content {
+  > section {
+    padding-block: 0;
+    background: var(--color-bg);
+  }
+
+  .container,
+  .container-wide,
+  .container-narrow {
+    max-width: none;
+    padding-inline: 15px;
+
+    @media (width >= 601px) {
+      padding-inline: 35px;
+    }
+  }
+}
+
+.design-system .prose {
+  gap: 25px;
+  font-size: 16px;
+  line-height: normal;
+
+  h1,
+  h2 {
+    font-family: var(--font-family-heading);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 29px;
+    text-wrap: wrap;
+    letter-spacing: normal;
+  }
+
+  h3,
+  h4 {
+    @include body-type-heading;
+  }
+
+  p,
+  li {
+    line-height: normal;
+  }
+
+  ul:not([class]),
+  ol:not([class]) {
+    gap: 15px;
+    padding-left: 40px;
+  }
+}
+
+// External links carry the USWDS "launch" mark, as on the live site
+.design-system main a[href^="http"]:not(.btn)::after,
+.design-system footer a[href^="http"]::after {
+  content: "";
+
+  display: inline;
+
+  margin-left: 2px;
+  padding-left: 1.75ex;
+
+  vertical-align: middle;
+
+  background-color: currentcolor;
+
+  mask-image: url("../assets/fyst/launch.svg");
+  mask-repeat: no-repeat;
+}
+
+.design-system a:not(.btn):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 5px var(--fyst-focus-link);
+}
+
+// ---------------------------------------------------------------------------
+// Buttons: 22px bold labels, 3px borders, 4px corners, 345px wide from 601px
+// (full width on phones), set 12.5px in from the text column. Primary fills
+// with the chrome color; secondary is white with near-black ink.
+// ---------------------------------------------------------------------------
+.design-system .link-button {
+  justify-content: flex-start;
+}
+
+.design-system .btn {
+  display: flex;
+  gap: 0;
+  align-items: center;
+  justify-content: center;
+
+  width: calc(100% - 25px);
+  max-width: none;
+  min-height: 0;
+  margin-inline: 12.5px;
+  padding: 16px 24px;
+  border: 3px solid var(--fyst-chrome);
+  border-radius: 4px;
+
+  font-family: var(--font-family-body);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 25px;
+  text-align: center;
+  text-decoration: none;
+
+  box-shadow: none;
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #FFF, 0 0 0 7px var(--fyst-focus-button);
+  }
+
+  &--primary,
+  &--primary:hover:not(:disabled) {
+    color: #FFF;
+    background: var(--fyst-chrome);
+  }
+
+  &--secondary,
+  &--secondary:hover:not(:disabled) {
+    border-color: #121111;
+    color: #121111;
+    background: #FFF;
+  }
+
+  &--secondary:hover:not(:disabled) {
+    background: var(--color-hover-bg);
+  }
+
+  // The live "Visit GetYourRefund" button leads with the launch mark
+  &--secondary::before {
+    content: "";
+
+    flex: 0 0 auto;
+
+    width: 20px;
+    height: 20px;
+    margin: 0 6px 0 5px;
+
+    background: currentcolor;
+
+    mask: url("../assets/fyst/launch.svg") center / contain no-repeat;
+  }
+
+  @media (width >= 601px) {
+    max-width: 345px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Home: the closure notice, the 48px headline, the intro and two buttons
+// ---------------------------------------------------------------------------
+.design-system .callout--warning {
+  --callout-bg: var(--color-tint);
+  --callout-fg: #000;
+
+  padding: 10px;
+  border: 2px solid #FFAE00;
+  border-radius: 0;
+}
+
+body:is(.page--en, .page--es) main#content {
+  > section:has(.callout) {
+    padding-top: 10px;
+  }
+
+  // 60px from the notice to the headline, as on the live page
+  > section:has(.callout) + section {
+    padding-top: 60px;
+  }
+
+  > section:has(.link-button) {
+    padding-top: 25px;
+  }
+
+  > section:last-child {
+    padding-bottom: 25px;
+  }
+
+  .prose {
+    // One blank line between the intro paragraphs (the live <br><br>)
+    gap: 1lh;
+
+    h1 {
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 56px;
+    }
+
+    // 1lh gap (19.4px) + 5.6px = 25px below the headline
+    h1 + * {
+      margin-top: calc(25px - 1lh);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// FAQ hub and state indexes: headings with link lists, 15px between links and
+// 35px around each list
+// ---------------------------------------------------------------------------
+body[class*="--faq"]:not([class*="--faq--"]) main#content {
+  > section {
+    padding-block: 35px;
+  }
+
+  .prose {
+    gap: 15px;
+
+    // 15px gap + 20px = 35px from a heading to its first link and from the
+    // last link to the next heading
+    :is(h1, h2) + p,
+    p + h2 {
+      margin-top: 20px;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// FAQ questions: the question, then the answer in a white card (New Jersey's
+// answers sit on the page, unboxed, with unbulleted lists, as on the live
+// site). Answers keep the live one-blank-line rhythm between paragraphs.
+// ---------------------------------------------------------------------------
+body[class*="--faq--"] main#content {
+  > section:first-child {
+    padding-top: 35px;
+  }
+
+  > section + section {
+    padding-top: 25px;
+    padding-bottom: 20px;
+  }
+
+  > section + section .prose {
+    gap: 1lh;
+
+    ul:not([class]) {
+      gap: 5px;
+      padding-left: 30px;
+      list-style: disc;
+
+      li {
+        line-height: 24px;
+      }
+    }
+
+    // 1lh gap + 10px list margin = the live space around a list
+    p + ul,
+    ul + p {
+      margin-top: 10px;
+    }
+  }
+}
+
+body[class*="--faq--"]:not([class*="--nj--faq--"]) main#content > section + section .prose {
+  @include white-card;
+}
+
+body[class*="--nj--faq--"] main#content > section + section .prose {
+  ul:not([class]) {
+    gap: 0;
+    padding-left: 0;
+    list-style: none;
+
+    li {
+      line-height: normal;
+    }
+
+    li::marker {
+      content: none;
+    }
+  }
+
+  // 1lh gap + 16px list margin = the live space around an unbulleted list
+  p + ul,
+  ul + p {
+    margin-top: 16px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Privacy policy, SMS terms and the 404: the live "slab" layout, a 960px grid
+// whose text column is three quarters wide (full width on phones), 60px in
+// from the header.
+// ---------------------------------------------------------------------------
+body:is([class~="page--en--privacy-policy"], [class~="page--es--privacy-policy"], [class~="page--en--sms-terms"], [class~="page--es--sms-terms"], .page--404-html) main#content {
+  :is(.container-wide, .container-narrow) {
+    max-width: 1080px;
+    padding-inline: 15px;
+
+    > * {
+      width: 100%;
+
+      @media (width >= 601px) {
+        max-width: 74.4106%;
+      }
+    }
+
+    @media (width >= 602px) {
+      padding-inline: 60px;
+    }
+  }
+
+  > section:first-child {
+    padding-top: 60px;
+  }
+
+  > section:last-child {
+    padding-bottom: 60px;
+  }
+}
+
+// Privacy policy: Geologica regular title, bold body-type section headings
+body:is([class~="page--en--privacy-policy"], [class~="page--es--privacy-policy"]) main#content {
+  > section:last-child {
+    // the last paragraph's 25px + the slab's 60px
+    padding-bottom: 85px;
+  }
+
+  .prose {
+    h1 {
+      font-weight: 400;
+      line-height: normal;
+    }
+
+    h2 {
+      @include body-type-heading;
+    }
+
+    h4 {
+      line-height: 25px;
+    }
+
+    // 25px gap + 10px = 35px above each section heading
+    * + h2 {
+      margin-top: 10px;
+    }
+
+    // 25px gap − 9px = the live 16px below a list
+    ul + p {
+      margin-top: -9px;
+    }
+  }
+}
+
+// SMS terms: the title, then the numbered terms in a white card
+body:is([class~="page--en--sms-terms"], [class~="page--es--sms-terms"]) main#content {
+  > section + section {
+    padding-top: 25px;
+  }
+
+  > section:last-child {
+    // the card's 20px margin + the slab's 60px
+    padding-bottom: 80px;
+  }
+
+  > section + section .prose {
+    // 20px card padding + the list's 16px margin above; its last term's
+    // 25px below
+    @include white-card(36px 20px 45px);
+
+    ol:not([class]) {
+      gap: 25px;
+      padding-left: 20px;
+    }
+
+    ol ol:not([class]) {
+      margin-top: 25px;
+      list-style-type: lower-alpha;
+    }
+
+    li,
+    p {
+      line-height: 24px;
+    }
+
+    li > p + p {
+      margin-top: 25px;
+    }
+  }
+}
+
+// 404: the illustration, a Geologica title and a large help line
+.page--404-html main#content {
+  .prose {
+    gap: 25px;
+
+    img {
+      width: 100px;
+      height: 75px;
+    }
+
+    h1 {
+      font-weight: 400;
+      line-height: normal;
+    }
+
+    // 25px gap − 21px = the live 4px under the illustration
+    img + h1 {
+      margin-top: -21px;
+    }
+
+    p {
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 29px;
+    }
+  }
+
+  // the help line's 25px margin + the live 10px above the button stack
+  > section:has(.link-button) {
+    padding-top: 35px;
+  }
+
+  .btn {
+    margin-inline: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Footer: the chrome band with the live 960px grid: logo and sentence in a
+// three-quarter column, the link list in the last quarter (stacked on phones)
+// ---------------------------------------------------------------------------
+.design-system footer {
+  --color-link: #FFF;
+  --color-link-hover: #FFF;
+
+  display: grid;
+  grid-template-columns: 74.4106% 23.2318%;
+  // The link list spans the first two rows (the second absorbs its height,
+  // so the logo row stays the logo's height); the language switcher, which
+  // the template renders first in the footer, ends the list in row three.
+  grid-template-rows: auto 1fr auto;
+  column-gap: 2.3577%;
+  align-content: start;
+
+  padding: 60px max(60px, calc(50% - 480px)) 95px;
+
+  font-size: 16px;
+  line-height: normal;
+  color: #FFF;
+  text-align: left;
+
+  background: var(--fyst-chrome);
+
+  > img {
+    grid-column: 1;
+    grid-row: 1;
+    width: 222px;
+    height: 38px;
+  }
+
+  > p {
+    grid-column: 1;
+    grid-row: 2;
+
+    // 25px paragraph margin + the live inline logo's 4px baseline gap
+    margin: 29px 0 0;
+    padding-right: 120px;
+
+    line-height: normal;
+  }
+
+  // Matching the template's list selector (ul:not([class])) so its indent
+  // and gap give way to the live 20px rows with 10px between
+  > ul:not([class]),
+  > .language-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+
+    li {
+      line-height: 20px;
+    }
+  }
+
+  > ul:not([class]) {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-top: 53px;
+  }
+
+  > .language-links {
+    grid-column: 2;
+    grid-row: 3;
+    align-items: flex-start;
+
+    // 10px between rows; 16px list margin + the last row's 10px below
+    margin: 10px 0 26px;
+  }
+
+  a {
+    color: #FFF;
+    text-decoration: underline;
+  }
+
+  @media (width < 601px) {
+    grid-template-columns: 1fr;
+
+    > p {
+      padding-right: 0;
+    }
+
+    > ul:not([class]) {
+      grid-column: 1;
+      grid-row: 3;
+    }
+
+    > .language-links {
+      grid-column: 1;
+      grid-row: 4;
+
+      // On phones the last row's 10px collapses into the list's 16px margin
+      margin-bottom: 16px;
+    }
+  }
+
+  // The live slab's 15px insets run to 601px; 60px from 602px
+  @media (width < 602px) {
+    padding-inline: 15px;
+  }
 }

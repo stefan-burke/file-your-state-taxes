@@ -1,5 +1,7 @@
 {%- comment -%}
-  Header slot after the menu: the language switcher, when config
-  language_switcher puts it in the header rather than the footer.
+  Header slot after the menu: the language switcher. This site shows the
+  language link in the header and at the end of the footer's link list, as
+  the live site does, and config language_switcher allows one placement, so
+  the switcher is rendered here for whichever placement is configured.
 {%- endcomment -%}
-{%- include "language-switcher.html", placement: "header" -%}
+{%- include "language-switcher.html", placement: config.language_switcher -%}
